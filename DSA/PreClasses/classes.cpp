@@ -1,4 +1,4 @@
-
+//very basics of classes // not deratiled oop principels tho
 
 #include <iostream>
 

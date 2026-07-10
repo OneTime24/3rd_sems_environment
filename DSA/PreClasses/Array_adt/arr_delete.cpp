@@ -1,74 +1,74 @@
 
 
 #include <iostream>
+
 using namespace std;
 
 
-struct Array{
-
+class Array{
+    public:
     int *arry;
     int size;
-    int length;
-    
+    int leng;
+
+
+    void inp(){
+        cout<<"Enter values; ";
+
+        for(int i=0;i<leng;i++){
+            cin>>arry[i];
+        }
+    }
+
+    void display(){
+        for(int i=0;i<leng;i++){
+            cout<<"\n-------------------\n"<<arry[i]<<" "<<endl;
+        }
+    }
+
+    void del(){
+
+        int ind;
+        cout<<"Enter index of the value to delete: ";
+        cin>>ind;
+
+
+        for(int i=ind;i<leng-1;i++){
+
+            arry[i]=arry[i+1];
+        }
+
+        leng--;
+
+    }
 };
-
-
-void inp(Array ar){
-
-    cout<<"Enter values in the array: ";
-
-    for(int i=0;i<ar.length;i++){
-        cin>>ar.arry[i];
-    }
-
-
-}
-
-void display(Array ar){
-    cout<<"\nValues in the array: ";
-
-    for(int i=0;i<ar.length;i++){
-        cout<<ar.arry[i]<<" ";
-    }
-}
-
-void del(Array *ar){
-    cout<<"Enter Index to delete: ";
-    int ind;
-    cin>>ind;
-
-    cout<<"Value at the given index is: "<<ar->arry[ind];
-
-
-    for(int i=ind;i<ar->length-1;i++){
-
-        ar->arry[i]=ar->arry[i+1];
-
-    }
-    ar->length--;
-}
 
 int main(){
 
-    Array ar;
+    Array arr;
 
-    cout<<"Enter array size: ";
-    cin>>ar.size;
 
-    ar.arry=new int[ar.size];
-    cout<<"Enter number of elements: ";
-    int n;
-    cin>>n;
-    ar.length=n;
+    cout<<"Enter size of the array: ";
 
-    //to take input
-    inp(ar);
+    cin>>arr.size;
 
-    display(ar);
 
-    del(&ar);
+    arr.arry=new int[arr.size];
 
-display(ar);
+    cout<<"Etner number of elemetns: ";
+
+    cin>>arr.leng;
+
+    arr.inp();
+
+    arr.display();
+
+    arr.del();
+
+    arr.display();
+
+
+
 
 
 }
