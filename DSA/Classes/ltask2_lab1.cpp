@@ -23,6 +23,9 @@ void chk(char* a,int n,int ti){
 
 int main(){
     char nm[]="MohsinAli";
-    chk(nm,9,4);
+    // char *nm;
+    // // nm=new char[100];                 //does work but ISO c++ forbids string constant to char* so we using direct char nm[] for this one only
+    // nm="MohsinAli";
+    chk(nm,9,0);
     return 0;
 }
