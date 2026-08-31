@@ -1,95 +1,205 @@
-
-
 #include <iostream>
 using namespace std;
 
-
-class arra{
-    private:
+class arra {
+private:
     int *arr;
-    int *arr2;
+    int *curr;
     int size;
-    // int *curr;
     int len;
 
-    public:
+public:
 
-    arra(int sz){
-        size=sz;
-        arr=new int[size];
-        arr2=nullptr;
-        len=0;
-
+    arra(int sz) {
+        size = sz;
+        arr = new int[size];
+        curr = nullptr;
+        len = 0;
     }
 
+    ~arra() {
+        delete[] arr;
+    }
 
-    void add(int val){
-        *(arr+len)=val;
+    void start() {
+        curr = arr;
+    }
+
+    void tail() {
+        curr = arr + len - 1;
+    }
+
+    void next() {
+        if (curr < arr + len - 1)
+            curr++;
+    }
+
+    void back() {
+        if (curr > arr)
+            curr--;
+    }
+
+    void append(int val) {
+        if (len < size) {
+            tail();
+            next();
+            *curr = val;
+            len++;
+        }
+    }
+
+    void insert(int pos, int val) {
+        if (len >= size || pos < 0 || pos > len)
+            return;
+
+        tail();
+
+        for (int i = len; i > pos; i--)
+            *(arr + i) = *(arr + i - 1);
+
+        start();
+
+        for (int i = 0; i < pos; i++)
+            next();
+
+        *curr = val;
         len++;
     }
-    void remove(int pos){
-        
-        for (int i=pos;i<len-1;i++){
-            *(arr)=*(arr-1);
 
-        }
+    void remove(int pos) {
+        if (pos < 0 || pos >= len)
+            return;
+
+        start();
+
+        for (int i = 0; i < pos; i++)
+            next();
+
+        for (int i = pos; i < len - 1; i++)
+            *curr = *(curr + 1), next();
+
         len--;
+
+        if (len > 0)
+            tail();
+        else
+            curr = nullptr;
     }
 
-    void insert(int pos,int val){
-        if(pos>0 && pos<size){
-        for(int i=pos;i<len;i++){
-            *(arr+1)=*(arr);
-        }
+    int get(int pos) {
+        if (pos < 0 || pos >= len)
+            return -1;
 
-        *(arr+pos)=val;
-        len++;
-    }
-    }
+        start();
 
-    void findx(int val){
-        int flg=0;
-        
-        for(int i=0;i<len;i++){
-            if (*(arr+i)==val){
-                flg=1;
-            }
-        }
+        for (int i = 0; i < pos; i++)
+            next();
 
-        if(flg==1){
-            cout<<"FOUUND"<<endl;
-        }else{
-            cout<<"NOT FOUND: ";
-        }
+        return *curr;
     }
 
-    void copy(int sz){
-        if(sz>=size){
-            arr2=new int[sz];
-            for(int i=0;i<len;i++){
-                *(arr2+i)=*(arr+i);
-            }
-        }
+    void update(int pos, int val) {
+        if (pos < 0 || pos >= len)
+            return;
 
+        start();
+
+        for (int i = 0; i < pos; i++)
+            next();
+
+        *curr = val;
     }
 
-    void display(arra obj){
-        for(int i=0;i<obj.len;i++){
-            cout<<"Value: "<<*(obj.arr+i)<<endl;
+    int find(int val) {
+        if (len == 0)
+            return -1;
+
+        start();
+
+        for (int i = 0; i < len; i++) {
+            if (*curr == val)
+                return i;
+
+            next();
         }
+
+        return -1;
+    }
+
+    int length() {
+        return len;
+    }
+
+    void clear() {
+        len = 0;
+        curr = nullptr;
+    }
+
+    void copy(const arra &other) {
+        if (size < other.len) {
+            delete[] arr;
+            size = other.size;
+            arr = new int[size];
+        }
+
+        len = other.len;
+
+        start();
+
+        for (int i = 0; i < len; i++) {
+            *curr = *(other.arr + i);
+            next();
+        }
+
+        if (len > 0)
+            tail();
+    }
+
+    void display() {
+        if (len == 0) {
+            cout << "List is empty\n";
+            return;
+        }
+
+        start();
+
+        for (int i = 0; i < len; i++) {
+            cout << *curr << " ";
+            next();
+        }
+
+        cout << endl;
     }
 };
 
-int main(){
+int main() {
 
-    arra a1(10);
-    a1.add(1);
-    a1.add(2);
-    a1.add(3);
-    a1.add(4);
-    a1.add(5);
-    a1.add(6);
+    arra list(10);
 
-    a1.copy(9);
-    a1.display(a1);
+    list.append(10);
+    list.append(20);
+    list.append(30);
+    list.append(40);
+
+    list.display();
+
+    list.insert(2, 25);
+    list.display();
+
+    list.remove(1);
+    list.display();
+
+    cout << "Get: " << list.get(2) << endl;
+
+    list.update(1, 100);
+    list.display();
+
+    cout << "Find 30: " << list.find(30) << endl;
+
+    cout << "Length: " << list.length() << endl;
+
+    list.clear();
+    list.display();
+
+    return 0;
 }
