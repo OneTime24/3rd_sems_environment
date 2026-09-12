@@ -75,6 +75,35 @@ class linkedl{
         }
     }
 
+    
+    void recurs_rev(node *q, node *p){
+
+        if(p!=nullptr){
+            recurs_rev(p,p->next);
+            p->next=q;
+        }else{
+            head=q;
+        }
+    }
+    node *reverse(){
+
+        node *prev=nullptr;
+        curr=head;
+        
+        recurs_rev(prev,curr);
+
+        // while(curr!=nullptr){
+
+        //     next=curr->next; // save the chain
+        //     curr->next=prev;       //reverse the chain
+        //     prev=curr;              //move the prev pointer one ahead
+        //     curr=next;          //move curr to the next
+        // }
+        // head=prev;
+        return head;
+
+    }
+
     void del(int pos){
 
         node *p=head;
@@ -109,9 +138,23 @@ int main(){
     l1.insert(4,40);
     l1.traverse();
 
-    l1.del(4);
-    l1.del(1);
+    // l1.del(4);
+    // l1.del(1);
+
+    // cout<<"\n____________________________________\n";
+    // l1.traverse();
+
+
+    node *revl1=l1.reverse();
 
     cout<<"\n____________________________________\n";
-    l1.traverse();
+    
+    while(revl1 != nullptr){
+            cout << revl1->data << " ";
+            revl1 = revl1->next;
+        }
+
+
+
+
 }
