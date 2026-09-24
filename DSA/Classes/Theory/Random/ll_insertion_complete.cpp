@@ -30,33 +30,63 @@ class linkedlist{
         len=0;
     }
 
-    void insert(int pos,int val){
-        node *n=new node(val);
+    // void insert(int pos,int val){
+    //     node *n=new node(val);
 
+    //     if(pos==1){
+    //         n->next=head;
+    //         head=n;
+    //         len++;
+    //         tail=n;
+    //     }else if(pos==len+1){
+    //         n->next=nullptr;
+    //         tail->next=n;
+    //         tail=n;
+    //         len++;
+            
+    //     }else{
+    //         node *curr=head;
+
+    //         for(int i=1;i<pos-1;i++){
+    //             curr=curr->next;
+    //         }
+
+    //         n->next=curr->next;
+    //         curr->next=n;
+
+    //     }
+
+    
+    // }
+
+    void insert(int pos, int val){
+
+        node *curr=head;
+        node *n=new node(val);
         if(pos==1){
             n->next=head;
             head=n;
             len++;
-            tail=n;
+            return ;
         }else if(pos==len+1){
-            n->next=nullptr;
-            tail->next=n;
-            tail=n;
-            len++;
-            
-        }else{
-            node *curr=head;
-
             for(int i=1;i<pos-1;i++){
                 curr=curr->next;
+            }
+            n->next=nullptr;
+            curr->next=n;
+            len++;
+            return ;
+        }
+        curr=head;
+        for(int i=1;i<pos-1;i++){
+            curr=curr->next;
             }
 
             n->next=curr->next;
             curr->next=n;
-
-        }
-
-    
+            len++;
+            return ;
+        
     }
 
     void traverse(){

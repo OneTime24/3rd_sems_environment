@@ -4,7 +4,6 @@
 
 using namespace std;
 
-
 class node{
     public:
     int data;
@@ -57,6 +56,7 @@ class linked{
                 curr->next->prev=n;
             }
             curr->next=n;
+            n->prev=curr;
             len++;
         }
     }

@@ -89,17 +89,18 @@ class linkedl{
 
         node *prev=nullptr;
         curr=head;
+        node *next=nullptr;
         
-        recurs_rev(prev,curr);
+        // recurs_rev(prev,curr);
 
-        // while(curr!=nullptr){
+        while(curr!=nullptr){
 
-        //     next=curr->next; // save the chain
-        //     curr->next=prev;       //reverse the chain
-        //     prev=curr;              //move the prev pointer one ahead
-        //     curr=next;          //move curr to the next
-        // }
-        // head=prev;
+            next=curr->next; // save the chain
+            curr->next=prev;       //reverse the chain
+            prev=curr;              //move the prev pointer one ahead
+            curr=next;          //move curr to the next
+        }
+        head=prev;
         return head;
 
     }
