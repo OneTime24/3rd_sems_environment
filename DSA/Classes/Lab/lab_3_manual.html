@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack — Data Structures Lab | FAST NUCES Peshawar</title>
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --brand:#4f46e5;
+  --brand-2:#6366f1;
+  --brand-dark:#312e81;
+  --cyan:#06b6d4;
+  --amber:#f59e0b;
+  --green:#10b981;
+  --red:#ef4444;
+  --bg:#eef2f7;
+  --card:#ffffff;
+  --line:#e2e8f0;
+  --code-bg:#0d1424;
+  --radius:16px;
+  --shadow:0 10px 30px rgba(15,23,42,.08);
+  --shadow-lg:0 20px 50px rgba(15,23,42,.14);
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #e0e7ff 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #cffafe 0%, transparent 50%),
+    var(--bg);
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============================================================
+   HEADER / BRANDING
+   ============================================================ */
+header.hero{
+  background:linear-gradient(135deg,#1e1b4b 0%,#4338ca 45%,#0891b2 100%);
+  color:#fff;
+  padding:46px 26px 60px;
+  position:relative;
+  overflow:hidden;
+}
+header.hero::after{
+  content:"";
+  position:absolute; inset:0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.14) 0, transparent 22%),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,.10) 0, transparent 20%);
+  pointer-events:none;
+}
+.hero-inner{max-width:1080px;margin:0 auto;position:relative;z-index:2;}
+.brand-row{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px;
+}
+.chip{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.28);
+  padding:6px 13px;border-radius:999px;
+  font-size:12.5px;font-weight:600;letter-spacing:.3px;
+  backdrop-filter:blur(6px);
+}
+.chip.solid{background:#fff;color:var(--brand-dark);border-color:#fff;}
+h1.title{
+  font-size:clamp(30px,5vw,50px);
+  margin:6px 0 10px;
+  line-height:1.1;
+  letter-spacing:-1px;
+  font-weight:800;
+}
+h1.title span{
+  background:linear-gradient(90deg,#fde68a,#67e8f9);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.subtitle{font-size:17px;opacity:.92;max-width:720px;margin:0 0 26px;}
+.meta-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:12px;margin-top:8px;
+}
+.meta-card{
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:14px;padding:12px 15px;
+  backdrop-filter:blur(8px);
+}
+.meta-card .k{font-size:11px;text-transform:uppercase;letter-spacing:1.1px;opacity:.75;font-weight:700;}
+.meta-card .v{font-size:15px;font-weight:700;margin-top:3px;}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+nav.sticky{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 4px 18px rgba(15,23,42,.05);
+}
+nav.sticky .nav-inner{
+  max-width:1080px;margin:0 auto;padding:9px 18px;
+  display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;
+}
+nav.sticky .nav-inner::-webkit-scrollbar{display:none;}
+nav.sticky a{
+  white-space:nowrap;text-decoration:none;color:var(--muted);
+  font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;
+  transition:.18s;
+}
+nav.sticky a:hover{background:#eef2ff;color:var(--brand);}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+main{max-width:1080px;margin:0 auto;padding:34px 18px 90px;}
+section{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:28px 26px;
+  margin-bottom:28px;
+  scroll-margin-top:70px;
+}
+section > h2{
+  font-size:25px;margin:0 0 6px;letter-spacing:-.5px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.sec-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:11px;flex:0 0 auto;
+  background:linear-gradient(135deg,var(--brand),var(--cyan));
+  color:#fff;font-size:15px;font-weight:800;
+  box-shadow:0 6px 16px rgba(79,70,229,.32);
+}
+.lede{color:var(--muted);font-size:15.5px;margin:0 0 18px;}
+h3{font-size:18.5px;margin:26px 0 8px;letter-spacing:-.3px;}
+h4{font-size:15.5px;margin:18px 0 6px;color:var(--brand-dark);}
+p{margin:9px 0;}
+ul,ol{margin:9px 0 9px 20px;padding:0;}
+li{margin:5px 0;}
+
+/* ============================================================
+   INLINE CODE + CODE BLOCKS
+   ============================================================ */
+code.inline{
+  background:#eef2ff;color:#4338ca;
+  padding:2px 7px;border-radius:6px;
+  font-family:"JetBrains Mono",Consolas,"Courier New",monospace;
+  font-size:13.5px;font-weight:600;
+}
+.code-wrap{
+  margin:14px 0 20px;border-radius:14px;overflow:hidden;
+  border:1px solid #1e293b;box-shadow:var(--shadow);
+  background:var(--code-bg);
+}
+.code-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:9px 14px;
+  background:#131c31;border-bottom:1px solid #1e293b;
+}
+.code-bar .fname{
+  font-family:"JetBrains Mono",Consolas,monospace;
+  font-size:12.5px;color:#93c5fd;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+.dot.r{background:#ff5f57;} .dot.y{background:#febc2e;} .dot.g{background:#28c840;}
+.copy-btn{
+  background:#1e293b;color:#cbd5e1;border:1px solid #334155;
+  border-radius:7px;padding:4px 11px;font-size:11.5px;font-weight:700;
+  cursor:pointer;transition:.18s;font-family:inherit;
+}
+.copy-btn:hover{background:#334155;color:#fff;}
+pre{
+  margin:0;padding:16px 18px;overflow-x:auto;
+  font-family:"JetBrains Mono",Consolas,"Courier New",monospace;
+  font-size:13.4px;line-height:1.72;color:#dbe4f3;
+  tab-size:4;
+}
+pre code{white-space:pre;}
+.c-kw{color:#c792ea;font-weight:600;}
+.c-st{color:#c3e88d;}
+.c-cm{color:#64748b;font-style:italic;}
+.c-num{color:#f78c6c;}
+.c-fn{color:#82aaff;}
+.c-pp{color:#ffcb6b;font-weight:600;}
+
+/* ============================================================
+   CALLOUTS
+   ============================================================ */
+.callout{
+  border-left:5px solid var(--brand);
+  background:#eef2ff;
+  padding:13px 17px;border-radius:0 12px 12px 0;
+  margin:16px 0;font-size:14.6px;
+}
+.callout .h{font-weight:800;display:block;margin-bottom:3px;font-size:14px;letter-spacing:.2px;}
+.callout.tip{border-color:var(--green);background:#ecfdf5;}
+.callout.tip .h{color:#047857;}
+.callout.warn{border-color:var(--amber);background:#fffbeb;}
+.callout.warn .h{color:#b45309;}
+.callout.danger{border-color:var(--red);background:#fef2f2;}
+.callout.danger .h{color:#b91c1c;}
+.callout.info{border-color:var(--cyan);background:#ecfeff;}
+.callout.info .h{color:#0e7490;}
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.table-scroll{overflow-x:auto;margin:14px 0;}
+table{
+  width:100%;border-collapse:collapse;font-size:14.2px;
+  border-radius:12px;overflow:hidden;min-width:520px;
+}
+thead th{
+  background:linear-gradient(135deg,#4338ca,#4f46e5);
+  color:#fff;text-align:left;padding:11px 14px;
+  font-size:12.8px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;
+}
+tbody td{padding:10px 14px;border-bottom:1px solid var(--line);}
+tbody tr:nth-child(even){background:#f8fafc;}
+tbody tr:hover{background:#eef2ff;}
+tbody tr:last-child td{border-bottom:none;}
+td.mono,th.mono{font-family:"JetBrains Mono",Consolas,monospace;font-size:13px;}
+.pill{
+  display:inline-block;padding:2px 9px;border-radius:999px;
+  font-size:11.5px;font-weight:800;letter-spacing:.4px;
+}
+.pill.green{background:#d1fae5;color:#047857;}
+.pill.amber{background:#fef3c7;color:#b45309;}
+.pill.red{background:#fee2e2;color:#b91c1c;}
+.pill.blue{background:#dbeafe;color:#1d4ed8;}
+
+/* ============================================================
+   ANALOGY — PLATE STACK
+   ============================================================ */
+.analogy-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+  gap:22px;align-items:start;margin-top:12px;
+}
+.plate-visual{
+  background:linear-gradient(180deg,#f8fafc,#eef2ff);
+  border:1px dashed #c7d2fe;border-radius:14px;
+  padding:22px;display:flex;flex-direction:column;align-items:center;
+}
+.plate-stack{display:flex;flex-direction:column;align-items:center;margin-bottom:14px;}
+.plate{
+  width:150px;height:15px;border-radius:50%;
+  background:linear-gradient(180deg,#ffffff,#dbeafe);
+  border:2px solid #93c5fd;
+  box-shadow:0 3px 7px rgba(59,130,246,.22);
+}
+.plate + .plate{margin-top:-7px;}
+.plate.top-plate{
+  border-color:var(--amber);
+  background:linear-gradient(180deg,#fffbeb,#fde68a);
+  box-shadow:0 4px 12px rgba(245,158,11,.42);
+}
+.arrow-up,.arrow-down{
+  font-size:26px;line-height:1;color:var(--amber);
+  animation:bounceY 1.5s ease-in-out infinite;
+}
+@keyframes bounceY{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-7px);}
+}
+.plate-caption{
+  font-size:12.5px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.8px;margin-top:8px;
+}
+
+/* ============================================================
+   STACK VISUALIZER
+   ============================================================ */
+.viz{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);
+  gap:22px;margin-top:14px;
+}
+@media(max-width:820px){.viz{grid-template-columns:1fr;}}
+
+.stack-frame{
+  background:linear-gradient(180deg,#f8fafc,#eef2ff);
+  border:1px solid #dbeafe;border-radius:14px;
+  padding:16px 14px 20px;
+}
+.slots{display:flex;flex-direction:column;gap:6px;}
+.slot{display:flex;align-items:center;gap:10px;}
+.slot .idx{
+  width:46px;text-align:right;flex:0 0 auto;
+  font-family:"JetBrains Mono",Consolas,monospace;
+  font-size:12.5px;color:#94a3b8;font-weight:600;
+}
+.slot .cell{
+  flex:1 1 auto;height:40px;border-radius:10px;
+  border:2px dashed #cbd5e1;background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:15px;color:#cbd5e1;
+  transition:all .22s ease;
+}
+.slot.filled .cell{
+  border-style:solid;border-color:var(--brand-2);
+  background:linear-gradient(135deg,#6366f1,#4f46e5);
+  color:#fff;box-shadow:0 6px 15px rgba(79,70,229,.35);
+}
+.slot.top .cell{
+  border-color:var(--amber);
+  background:linear-gradient(135deg,#fbbf24,#f59e0b);
+  box-shadow:0 0 0 4px rgba(245,158,11,.22),0 6px 16px rgba(245,158,11,.4);
+}
+.slot .toplabel{
+  flex:0 0 auto;font-size:12px;font-weight:800;
+  color:var(--amber);letter-spacing:.4px;
+}
+@keyframes popIn{
+  from{transform:scale(.55) translateY(-14px);opacity:0;}
+  to{transform:scale(1) translateY(0);opacity:1;}
+}
+.slot.animate .cell{animation:popIn .32s cubic-bezier(.34,1.56,.64,1);}
+.stack-floor{
+  height:6px;border-radius:4px;margin-top:8px;margin-left:56px;
+  background:linear-gradient(90deg,#94a3b8,#cbd5e1);
+}
+.cap-note{
+  font-size:12px;color:var(--muted);text-align:center;
+  margin-top:9px;font-weight:600;
+}
+
+/* controls */
+.controls{
+  background:#f8fafc;border:1px solid var(--line);
+  border-radius:14px;padding:16px;
+}
+.ctrl-row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:11px;}
+input[type=text],input[type=number]{
+  flex:1 1 130px;min-width:110px;
+  padding:10px 13px;border-radius:10px;
+  border:1.5px solid #cbd5e1;background:#fff;
+  font-size:14.5px;font-family:inherit;outline:none;
+  transition:.18s;
+}
+input[type=text]:focus,input[type=number]:focus{
+  border-color:var(--brand);box-shadow:0 0 0 4px rgba(79,70,229,.14);
+}
+.btn{
+  border:none;border-radius:10px;padding:10px 17px;
+  font-size:14px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:.18s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn:active{transform:translateY(1px) scale(.98);}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;box-shadow:0 6px 16px rgba(79,70,229,.32);}
+.btn-primary:hover{box-shadow:0 9px 22px rgba(79,70,229,.44);}
+.btn-warn{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;box-shadow:0 6px 16px rgba(245,158,11,.32);}
+.btn-warn:hover{box-shadow:0 9px 22px rgba(245,158,11,.44);}
+.btn-ghost{background:#fff;color:var(--brand);border:1.5px solid #c7d2fe;}
+.btn-ghost:hover{background:#eef2ff;}
+.btn-danger{background:#fff;color:var(--red);border:1.5px solid #fecaca;}
+.btn-danger:hover{background:#fef2f2;}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;}
+
+.stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0;
+}
+.stat{
+  background:#fff;border:1px solid var(--line);
+  border-radius:11px;padding:9px 11px;text-align:center;
+}
+.stat .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:800;}
+.stat .v{font-size:19px;font-weight:800;color:var(--brand-dark);font-family:"JetBrains Mono",Consolas,monospace;}
+
+.log{
+  background:#0d1424;border-radius:12px;padding:12px 14px;
+  height:172px;overflow-y:auto;
+  font-family:"JetBrains Mono",Consolas,monospace;
+  font-size:12.6px;line-height:1.75;color:#94a3b8;
+}
+.log div{border-bottom:1px dashed #1e293b;padding:2px 0;}
+.log div:last-child{border-bottom:none;}
+.log .ok{color:#4ade80;}
+.log .err{color:#f87171;}
+.log .warnl{color:#fbbf24;}
+.log .info{color:#67e8f9;}
+.log .hl{color:#c4b5fd;}
+
+/* ============================================================
+   PARENTHESIS CHECKER
+   ============================================================ */
+.paren-display{
+  font-family:"JetBrains Mono",Consolas,monospace;
+  font-size:26px;letter-spacing:3px;
+  background:#f8fafc;border:1px solid var(--line);
+  border-radius:12px;padding:18px;text-align:center;
+  margin:12px 0;overflow-x:auto;white-space:nowrap;
+}
+.paren-display span{padding:3px 5px;border-radius:6px;transition:.18s;}
+.paren-display span.cur{background:var(--amber);color:#fff;transform:scale(1.18);display:inline-block;}
+.paren-display span.done{color:#94a3b8;}
+.paren-stack-box{
+  background:#0d1424;border-radius:12px;padding:14px;
+  min-height:66px;display:flex;align-items:center;gap:8px;
+  overflow-x:auto;
+}
+.chip-el{
+  background:linear-gradient(135deg,#6366f1,#4f46e5);
+  color:#fff;font-family:"JetBrains Mono",Consolas,monospace;
+  font-weight:800;font-size:16px;
+  padding:7px 15px;border-radius:9px;
+  box-shadow:0 5px 14px rgba(79,70,229,.4);
+  flex:0 0 auto;
+  animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+.chip-el.topchip{background:linear-gradient(135deg,#fbbf24,#f59e0b);box-shadow:0 5px 14px rgba(245,158,11,.45);}
+.empty-stack{color:#475569;font-family:"JetBrains Mono",monospace;font-size:13px;font-style:italic;}
+.step-note{
+  background:#eef2ff;border-radius:11px;padding:12px 15px;
+  font-size:14.3px;font-weight:600;color:#3730a3;margin-top:12px;
+  border-left:4px solid var(--brand);
+}
+.step-note.err{background:#fef2f2;color:#b91c1c;border-color:var(--red);}
+.step-note.ok{background:#ecfdf5;color:#047857;border-color:var(--green);}
+.step-ctrls{display:flex;gap:9px;align-items:center;margin-top:12px;flex-wrap:wrap;}
+.step-count{font-size:13px;color:var(--muted);font-weight:700;font-family:"JetBrains Mono",monospace;}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz-item{
+  border:1px solid var(--line);border-radius:13px;
+  padding:15px 17px;margin-bottom:14px;background:#fbfdff;
+  transition:.2s;
+}
+.quiz-item.correct{border-color:#6ee7b7;background:#f0fdf4;}
+.quiz-item.wrong{border-color:#fca5a5;background:#fef2f2;}
+.quiz-q{font-weight:700;margin-bottom:10px;font-size:15px;}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;}
+.opt{
+  text-align:left;border:1.5px solid #e2e8f0;background:#fff;
+  border-radius:10px;padding:9px 14px;cursor:pointer;
+  font-size:14px;font-family:inherit;transition:.16s;color:var(--ink);
+}
+.opt:hover{border-color:var(--brand-2);background:#eef2ff;}
+.opt.chosen-right{border-color:var(--green);background:#d1fae5;font-weight:700;}
+.opt.chosen-wrong{border-color:var(--red);background:#fee2e2;font-weight:700;}
+.quiz-feedback{margin-top:9px;font-size:13.6px;font-weight:600;display:none;}
+.quiz-feedback.show{display:block;}
+
+/* ============================================================
+   TASKS
+   ============================================================ */
+.task{
+  border:1px solid var(--line);border-left:5px solid var(--brand);
+  border-radius:0 13px 13px 0;padding:14px 17px;margin-bottom:13px;
+  background:#fbfdff;
+}
+.task .th{font-weight:800;font-size:15.5px;color:var(--brand-dark);display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
+.task .tb{font-size:14.3px;color:#334155;margin-top:5px;}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  background:linear-gradient(135deg,#1e1b4b,#312e81);
+  color:#c7d2fe;padding:30px 20px;text-align:center;
+}
+footer .fname{font-weight:800;color:#fff;font-size:16px;}
+footer .fsmall{font-size:13px;opacity:.8;margin-top:5px;}
+
+@media (max-width:600px){
+  section{padding:20px 16px;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .paren-display{font-size:21px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HERO / BRANDING
+     ============================================================ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="brand-row">
+      <span class="chip solid">🎓 FAST NUCES</span>
+      <span class="chip">Peshawar Campus</span>
+      <span class="chip">Department of Computer Science</span>
+      <span class="chip">Data Structures Lab</span>
+    </div>
+
+    <h1 class="title">Laboratory&nbsp;Manual:<br><span>Stacks</span> — The LIFO Structure</h1>
+
+
+
+    <div class="meta-grid">
+      <div class="meta-card"><div class="k">Course / Subject</div><div class="v">Data Structures</div></div>
+      <div class="meta-card"><div class="k">Academic Level</div><div class="v">Undergraduate</div></div>
+      <div class="meta-card"><div class="k">Instructor</div><div class="v">Hamza Raziq Khan</div></div>
+      <div class="meta-card"><div class="k">Language</div><div class="v">C++ (English Manual)</div></div>
+      <div class="meta-card"><div class="k">Lab Duration</div><div class="v">3 Hours</div></div>
+      <div class="meta-card"><div class="k">Topic</div><div class="v">Stack (LIFO)</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav class="sticky">
+  <div class="nav-inner">
+    <a href="#objectives">🎯 Objectives</a>
+    <a href="#analogy">🍽️ Analogy</a>
+    <a href="#playground">🎮 Playground</a>
+    <a href="#operations">⚙️ Operations</a>
+    <a href="#array">📦 Array Impl.</a>
+    <a href="#linked">🔗 Linked Impl.</a>
+    <a href="#stl">🧰 STL</a>
+    <a href="#applications">🚀 Applications</a>
+    <a href="#complexity">📊 Complexity</a>
+    <a href="#tasks">📝 Lab Tasks</a>
+    <a href="#quiz">🧠 Quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============================================================
+     0. OBJECTIVES
+     ============================================================ -->
+<section id="objectives">
+  <h2><span class="sec-num">0</span> Lab Objectives &amp; Plan</h2>
+  <p class="lede">By the end of this 3-hour lab you will be able to do all of the following — confidently.</p>
+
+  <h3>🎯 Learning Objectives</h3>
+  <ul>
+    <li><strong>Define</strong> a stack and explain the <strong>LIFO</strong> (Last-In-First-Out) principle in your own words.</li>
+    <li><strong>Identify</strong> the five core operations: <code class="inline">push</code>, <code class="inline">pop</code>, <code class="inline">peek/top</code>, <code class="inline">isEmpty</code>, <code class="inline">isFull</code>.</li>
+    <li><strong>Trace</strong> a stack on paper, tracking the <code class="inline">top</code> index after every operation.</li>
+    <li><strong>Implement</strong> a stack using (a) a static array and (b) a singly linked list in C++.</li>
+    <li><strong>Use</strong> the C++ STL <code class="inline">std::stack</code> container correctly.</li>
+    <li><strong>Apply</strong> stacks to real problems: bracket matching, expression conversion, string reversal, undo.</li>
+    <li><strong>Analyse</strong> the time and space complexity of every stack operation.</li>
+  </ul>
+
+
+
+
+</section>
+
+<!-- ============================================================
+     1. ANALOGY
+     ============================================================ -->
+<section id="analogy">
+  <h2><span class="sec-num">1</span> The Analogy: A Stack of Plates</h2>
+  <p class="lede">Before we talk about memory and pointers, let's talk about lunch.</p>
+
+  <div class="analogy-grid">
+    <div class="plate-visual">
+      <div class="arrow-up">⬆️</div>
+      <div class="plate-stack">
+        <div class="plate"></div>
+        <div class="plate"></div>
+        <div class="plate"></div>
+        <div class="plate top-plate"></div>
+      </div>
+      <div class="arrow-down">⬇️</div>
+      <div class="plate-caption">Only the TOP plate is reachable</div>
+    </div>
+
+    <div>
+      <p>
+        Imagine a <strong>cafeteria stack of plates</strong>. The dishwasher places clean plates on top, one at a
+        time. Customers take plates from the top, one at a time.
+      </p>
+      <ul>
+        <li>The <strong>last</strong> plate placed on the pile is the <strong>first</strong> one taken off.</li>
+        <li>You <em>cannot</em> pull out the third plate from the bottom without removing everything above it.</li>
+        <li>If the pile reaches the ceiling — you can't add any more. That's <strong>overflow</strong>.</li>
+        <li>If the pile is empty and someone tries to take a plate — that's <strong>underflow</strong>.</li>
+      </ul>
+      <div class="callout">
+        <span class="h">🔑 The One Rule</span>
+        A stack is a <strong>LIFO</strong> structure: <strong>L</strong>ast <strong>I</strong>n, <strong>F</strong>irst <strong>O</strong>ut.
+        All insertion and deletion happen at <strong>one single end</strong>, called the <strong>top</strong>.
+      </div>
+    </div>
+  </div>
+
+  <h3>🌍 Real-Life Stacks You Already Use Every Day</h3>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Real-Life Example</th><th>What is "pushed"?</th><th>What is "popped"?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>🍟 Pringles can</td><td>Adding a chip on top</td><td>Taking the top chip</td></tr>
+        <tr><td>↩️ Ctrl + Z (Undo)</td><td>Each action you perform</td><td>The most recent action gets undone first</td></tr>
+        <tr><td>🌐 Browser Back button</td><td>Every page you visit</td><td>Going back to the most recent page</td></tr>
+        <tr><td>📚 Stack of textbooks</td><td>Placing a book on top</td><td>Removing the top book</td></tr>
+        <tr><td>📞 Function calls in C++</td><td>Calling a function</td><td>Returning from a function (the <em>call stack</em>)</td></tr>
+        <tr><td>🧮 Postfix expression evaluation</td><td>Pushing operands</td><td>Popping two operands per operator</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout tip">
+    <span class="h">💡 Memory hook</span>
+    Think of a <strong>stack of trays in a restaurant</strong>. The spring pushes the top tray up.
+    You always take the top one. You always add to the top one. <em>One end. Always.</em>
+  </div>
+</section>
+
+<!-- ============================================================
+     2. PLAYGROUND
+     ============================================================ -->
+<section id="playground">
+  <h2><span class="sec-num">2</span> Interactive Playground — See LIFO Happen</h2>
+  <p class="lede">
+    This is a real array-based stack of capacity 6. Each row is an array index. The
+    <span style="color:#f59e0b;font-weight:800;">orange</span> cell is the <code class="inline">top</code>.
+    Push, pop, and peek — watch the <code class="inline">top</code> pointer move.
+  </p>
+
+  <div class="viz">
+    <!-- LEFT: the stack -->
+    <div class="stack-frame">
+      <div class="slots" id="stackSlots"></div>
+      <div class="stack-floor"></div>
+      <div class="cap-note">Capacity = 6 elements &nbsp;•&nbsp; Indices grow upward</div>
+    </div>
+
+    <!-- RIGHT: controls -->
+    <div class="controls">
+      <div class="ctrl-row">
+        <input type="number" id="pushValue" placeholder="Value to push" value="10">
+        <button class="btn btn-primary" id="btnPush">⬆️ Push</button>
+      </div>
+      <div class="ctrl-row">
+        <button class="btn btn-warn" id="btnPop">⬇️ Pop</button>
+        <button class="btn btn-ghost" id="btnPeek">👁️ Peek</button>
+        <button class="btn btn-ghost" id="btnEmpty">❓ isEmpty?</button>
+        <button class="btn btn-ghost" id="btnFull">📏 isFull?</button>
+        <button class="btn btn-danger" id="btnClear">🗑️ Clear</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="k">Size</div><div class="v" id="statSize">0</div></div>
+        <div class="stat"><div class="k">Top Element</div><div class="v" id="statTop">—</div></div>
+        <div class="stat"><div class="k">Empty?</div><div class="v" id="statEmpty">Yes</div></div>
+      </div>
+
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <div class="callout warn" style="margin-top:20px;">
+    <span class="h">🧪 Things to try</span>
+    <ol style="margin-bottom:0;">
+      <li>Push <code class="inline">10</code>, <code class="inline">20</code>, <code class="inline">30</code>. Notice <code class="inline">top</code> is on <strong>30</strong>.</li>
+      <li>Press <strong>Pop</strong> once. What came out? (30, not 10!) That is LIFO.</li>
+      <li>Push six values until it's full, then try to push a seventh → <strong>Stack Overflow</strong>.</li>
+      <li>Clear everything, then press <strong>Pop</strong> → <strong>Stack Underflow</strong>.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================================================
+     3. OPERATIONS
+     ============================================================ -->
+<section id="operations">
+  <h2><span class="sec-num">3</span> The Five Core Operations</h2>
+  <p class="lede">Every stack in every language supports these five operations. Learn them once, use them forever.</p>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Operation</th><th>What it does</th><th>Pre-condition</th><th>Time</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono"><strong>push(x)</strong></td>
+          <td>Places <code class="inline">x</code> on top of the stack and moves <code class="inline">top</code> up by 1.</td>
+          <td>Stack must <strong>not</strong> be full</td>
+          <td><span class="pill green">O(1)</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><strong>pop()</strong></td>
+          <td>Removes and returns the top element, then moves <code class="inline">top</code> down by 1.</td>
+          <td>Stack must <strong>not</strong> be empty</td>
+          <td><span class="pill green">O(1)</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><strong>peek() / top()</strong></td>
+          <td>Returns the top element <em>without</em> removing it.</td>
+          <td>Stack must <strong>not</strong> be empty</td>
+          <td><span class="pill green">O(1)</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><strong>isEmpty()</strong></td>
+          <td>Returns <code class="inline">true</code> if the stack has zero elements.</td>
+          <td>None</td>
+          <td><span class="pill green">O(1)</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><strong>isFull()</strong></td>
+          <td>Returns <code class="inline">true</code> if the stack has reached its capacity (array version only).</td>
+          <td>None</td>
+          <td><span class="pill green">O(1)</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout danger">
+    <span class="h">⚠️ The Two Classic Errors</span>
+    <strong>Stack Overflow</strong> = you called <code class="inline">push()</code> on a <em>full</em> stack.<br>
+    <strong>Stack Underflow</strong> = you called <code class="inline">pop()</code> or <code class="inline">peek()</code> on an <em>empty</em> stack.<br>
+    <em>Always</em> check before you act. Every professional implementation does.
+  </div>
+
+  <h3>📝 Dry Run: Tracing a Stack by Hand</h3>
+  <p>Capacity = 5. Watch the <code class="inline">top</code> index after every single call. This is exactly what you'll be asked to do in the exam.</p>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Step</th><th>Operation</th><th class="mono">top</th><th>Array contents (index 0 → 4)</th><th>Returned / Output</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>0</td><td class="mono">— (initial)</td><td class="mono">-1</td><td class="mono">[ - , - , - , - , - ]</td><td>Stack is empty</td></tr>
+        <tr><td>1</td><td class="mono">push(10)</td><td class="mono">0</td><td class="mono">[ 10, - , - , - , - ]</td><td>—</td></tr>
+        <tr><td>2</td><td class="mono">push(20)</td><td class="mono">1</td><td class="mono">[ 10, 20, - , - , - ]</td><td>—</td></tr>
+        <tr><td>3</td><td class="mono">push(30)</td><td class="mono">2</td><td class="mono">[ 10, 20, 30, - , - ]</td><td>—</td></tr>
+        <tr><td>4</td><td class="mono">peek()</td><td class="mono">2</td><td class="mono">[ 10, 20, 30, - , - ]</td><td><strong>30</strong></td></tr>
+        <tr><td>5</td><td class="mono">pop()</td><td class="mono">1</td><td class="mono">[ 10, 20, 30, - , - ]</td><td><strong>30</strong></td></tr>
+        <tr><td>6</td><td class="mono">push(40)</td><td class="mono">2</td><td class="mono">[ 10, 20, 40, - , - ]</td><td>—</td></tr>
+        <tr><td>7</td><td class="mono">pop()</td><td class="mono">1</td><td class="mono">[ 10, 20, 40, - , - ]</td><td><strong>40</strong></td></tr>
+        <tr><td>8</td><td class="mono">pop()</td><td class="mono">0</td><td class="mono">[ 10, 20, 40, - , - ]</td><td><strong>20</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout info">
+    <span class="h">🔍 Important detail people miss</span>
+    After <code class="inline">pop()</code>, the old value (like <code class="inline">30</code> at index 2) is <strong>still physically in the array</strong>.
+    We simply moved <code class="inline">top</code> down. The value is now "logically deleted" and will be overwritten by the next push.
+    This is why pop is O(1) — no shifting, no erasing, just move a pointer.
+  </div>
+</section>
+
+<!-- ============================================================
+     4. ARRAY IMPLEMENTATION
+     ============================================================ -->
+<section id="array">
+  <h2><span class="sec-num">4</span> Implementation 1 — Array-Based Stack</h2>
+  <p class="lede">The simplest and fastest stack. An array + one integer called <code class="inline">top</code>.</p>
+
+  <h3>🧠 The Idea in One Picture</h3>
+  <p>
+    Picture a row of lockers numbered <code class="inline">0</code> to <code class="inline">N-1</code>.
+    A sticky note called <code class="inline">top</code> tells you which locker holds the current top element.
+    When the stack is empty, <code class="inline">top = -1</code> — a sentinel meaning "nowhere".
+  </p>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>State</th><th class="mono">top</th><th class="mono">size()</th><th class="mono">isEmpty()</th><th class="mono">isFull()</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Empty (capacity 5)</td><td class="mono">-1</td><td class="mono">0</td><td class="mono">true</td><td class="mono">false</td></tr>
+        <tr><td>1 element</td><td class="mono">0</td><td class="mono">1</td><td class="mono">false</td><td class="mono">false</td></tr>
+        <tr><td>5 elements (full)</td><td class="mono">4</td><td class="mono">5</td><td class="mono">false</td><td class="mono">true</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout tip">
+    <span class="h">💡 Two magic formulas</span>
+    <code class="inline">size() == top + 1</code> &nbsp;&nbsp;•&nbsp;&nbsp; <code class="inline">isFull() == (top == CAPACITY - 1)</code>
+  </div>
+
+  <h3>💻 Complete, Working C++ Code</h3>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <span class="fname"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> stack_array.cpp</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code>#include &lt;iostream&gt;
+using namespace std;
+
+const int CAPACITY = 5;      // maximum number of elements we can store
+
+class Stack {
+private:
+    int data[CAPACITY];      // the array that actually holds the elements
+    int top;                 // index of the TOP element; -1 means "empty"
+
+public:
+    // ---------- CONSTRUCTOR ----------
+    Stack() {
+        top = -1;            // a brand new stack is empty
+    }
+
+    // ---------- isEmpty ----------
+    bool isEmpty() {
+        return (top == -1);
+    }
+
+    // ---------- isFull ----------
+    bool isFull() {
+        return (top == CAPACITY - 1);
+    }
+
+    // ---------- PUSH : add to the top ----------
+    void push(int value) {
+        if (isFull()) {
+            cout &lt;&lt; "Stack Overflow! Cannot push " &lt;&lt; value &lt;&lt; endl;
+            return;                    // do nothing, stack is full
+        }
+        top++;                         // move top one step UP
+        data[top] = value;             // store the value there
+    }
+
+    // ---------- POP : remove from the top ----------
+    int pop() {
+        if (isEmpty()) {
+            cout &lt;&lt; "Stack Underflow! Nothing to pop." &lt;&lt; endl;
+            return -1;                 // sentinel value meaning "error"
+        }
+        int value = data[top];         // 1. remember the top value
+        top--;                         // 2. move top one step DOWN
+        return value;                  // 3. hand the value back
+    }
+
+    // ---------- PEEK : look without removing ----------
+    int peek() {
+        if (isEmpty()) {
+            cout &lt;&lt; "Stack is empty. Nothing to peek." &lt;&lt; endl;
+            return -1;
+        }
+        return data[top];
+    }
+
+    // ---------- SIZE ----------
+    int size() {
+        return top + 1;
+    }
+
+    // ---------- DISPLAY (top -&gt; bottom) ----------
+    void display() {
+        if (isEmpty()) {
+            cout &lt;&lt; "Stack: [ empty ]" &lt;&lt; endl;
+            return;
+        }
+        cout &lt;&lt; "Stack (top -&gt; bottom): ";
+        for (int i = top; i &gt;= 0; i--) {
+            cout &lt;&lt; data[i] &lt;&lt; " ";
+        }
+        cout &lt;&lt; endl;
+    }
+};
+
+// ================= MAIN =================
+int main() {
+    Stack s;
+
+    s.push(10);
+    s.push(20);
+    s.push(30);
+    s.display();                            // 30 20 10
+
+    cout &lt;&lt; "Top element : " &lt;&lt; s.peek()  &lt;&lt; endl;   // 30
+    cout &lt;&lt; "Size        : " &lt;&lt; s.size()  &lt;&lt; endl;   // 3
+
+    cout &lt;&lt; "Popped      : " &lt;&lt; s.pop()   &lt;&lt; endl;   // 30
+    s.display();                            // 20 10
+
+    cout &lt;&lt; "isEmpty?    : " &lt;&lt; (s.isEmpty() ? "Yes" : "No") &lt;&lt; endl;
+
+    s.pop();  s.pop();                      // empty it
+    s.pop();                                // -&gt; Stack Underflow!
+
+    return 0;
+}</code></pre>
+  </div>
+
+  <h4>Expected Output</h4>
+  <div class="code-wrap">
+    <div class="code-bar">
+      <span class="fname"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> console output</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code>Stack (top -&gt; bottom): 30 20 10
+Top element : 30
+Size        : 3
+Popped      : 30
+Stack (top -&gt; bottom): 20 10
+isEmpty?    : No
+Stack Underflow! Nothing to pop.</code></pre>
+  </div>
+
+  <h3>🔬 Line-by-Line: What Happens on push(30)?</h3>
+  <ol>
+    <li><code class="inline">isFull()</code> is called → <code class="inline">top == CAPACITY - 1</code>? Suppose <code class="inline">top = 1</code>, so it's <code class="inline">false</code>. Continue.</li>
+    <li><code class="inline">top++</code> → <code class="inline">top</code> becomes <code class="inline">2</code>.</li>
+    <li><code class="inline">data[2] = 30</code> → the value is stored.</li>
+    <li>Done. Total work: a comparison, an increment, and one array write. Constant time. <strong>O(1)</strong>.</li>
+  </ol>
+
+  <h3>🔬 Line-by-Line: What Happens on pop()?</h3>
+  <ol>
+    <li><code class="inline">isEmpty()</code> is called → <code class="inline">top == -1</code>? No. Continue.</li>
+    <li><code class="inline">value = data[top]</code> → save 30 into a local variable.</li>
+    <li><code class="inline">top--</code> → <code class="inline">top</code> becomes <code class="inline">1</code>.</li>
+    <li><code class="inline">return value</code> → 30 is returned.</li>
+    <li>Note: <code class="inline">data[2]</code> still contains 30 physically, but it is now outside the stack. It'll be overwritten on the next push.</li>
+  </ol>
+
+  <div class="callout warn">
+    <span class="h">⚠️ Limitation of the array version</span>
+    The capacity is <strong>fixed at compile time</strong>. If you need 10,000 elements but declared 5, you're stuck.
+    The fix is either (a) a <em>dynamic array</em> with <code class="inline">new</code>/<code class="inline">delete</code> and resizing,
+    or (b) a <strong>linked list</strong> — which is the next section.
+  </div>
+</section>
+
+<!-- ============================================================
+     5. LINKED LIST IMPLEMENTATION
+     ============================================================ -->
+<section id="linked">
+  <h2><span class="sec-num">5</span> Implementation 2 — Linked-List Stack</h2>
+  <p class="lede">Unlimited size, no overflow (until your RAM runs out). The top of the stack is simply the head of the list.</p>
+
+  <h3>🧠 The Idea</h3>
+  <p>
+    A linked list is a chain of nodes, where each node points to the next. If we say
+    <strong>"the head of the list is the top of the stack"</strong>, then:
+  </p>
+  <ul>
+    <li><strong>push(x)</strong> = insert a new node at the <em>head</em> → <span class="pill green">O(1)</span></li>
+    <li><strong>pop()</strong> = delete the node at the <em>head</em> → <span class="pill green">O(1)</span></li>
+    <li><strong>peek()</strong> = read <code class="inline">head-&gt;data</code> → <span class="pill green">O(1)</span></li>
+  </ul>
+
+  <div class="callout tip">
+    <span class="h">💡 Why the head and not the tail?</span>
+    Inserting/deleting at the head is O(1). Inserting/deleting at the <em>tail</em> of a singly linked list requires
+    walking the whole list — O(n). Always use the head as the top.
+  </div>
+
+  <h3>🎨 Visual: push(30) then push(40)</h3>
+  <div class="code-wrap">
+    <div class="code-bar"><span class="fname"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> memory diagram</span></div>
+<pre><code>BEFORE push(30):
+    top -&gt; [20 | next] -&gt; [10 | next] -&gt; NULL
+
+AFTER push(30):          (new node inserted at the head)
+    top -&gt; [30 | next] -&gt; [20 | next] -&gt; [10 | next] -&gt; NULL
+
+AFTER push(40):
+    top -&gt; [40 | next] -&gt; [30 | next] -&gt; [20 | next] -&gt; [10 | next] -&gt; NULL
+
+AFTER pop():             (head removed and deleted)
+    top -&gt; [30 | next] -&gt; [20 | next] -&gt; [10 | next] -&gt; NULL
+    (the node holding 40 has been freed)</code></pre>
+  </div>
+
+  <h3>💻 Complete, Working C++ Code</h3>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <span class="fname"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> stack_linkedlist.cpp</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code>#include &lt;iostream&gt;
+using namespace std;
+
+// ---------- A single node of our linked list ----------
+struct Node {
+    int   data;      // the value stored
+    Node* next;      // pointer to the node below it in the stack
+};
+
+class LinkedStack {
+private:
+    Node* top;       // points to the TOP node (the head of the list)
+
+public:
+    // ---------- CONSTRUCTOR ----------
+    LinkedStack() {
+        top = nullptr;                 // empty stack
+    }
+
+    // ---------- DESTRUCTOR : free all memory ----------
+    ~LinkedStack() {
+        while (!isEmpty()) {
+            pop();                     // pop() already deletes the node
+        }
+    }
+
+    // ---------- isEmpty ----------
+    bool isEmpty() {
+        return (top == nullptr);
+    }
+
+    // ---------- PUSH : insert at the head ----------
+    void push(int value) {
+        Node* newNode = new Node;      // 1. create a new node on the heap
+        newNode-&gt;data = value;         // 2. store the value
+        newNode-&gt;next = top;           // 3. new node points to the OLD top
+        top = newNode;                 // 4. the new node becomes the new top
+        // No isFull() check needed - the list grows as long as memory exists!
+    }
+
+    // ---------- POP : delete the head ----------
+    int pop() {
+        if (isEmpty()) {
+            cout &lt;&lt; "Stack Underflow! Nothing to pop." &lt;&lt; endl;
+            return -1;
+        }
+        Node* temp = top;              // 1. remember the node we are removing
+        int value = temp-&gt;data;        // 2. save its data
+        top = top-&gt;next;               // 3. move top down to the next node
+        delete temp;                   // 4. FREE the memory (very important!)
+        return value;                  // 5. return the data
+    }
+
+    // ---------- PEEK ----------
+    int peek() {
+        if (isEmpty()) {
+            cout &lt;&lt; "Stack is empty." &lt;&lt; endl;
+            return -1;
+        }
+        return top-&gt;data;
+    }
+
+    // ---------- SIZE : count the nodes ----------
+    int size() {
+        int count = 0;
+        Node* current = top;
+        while (current != nullptr) {
+            count++;
+            current = current-&gt;next;
+        }
+        return count;                  // O(n) - walk the whole list
+    }
+
+    // ---------- DISPLAY ----------
+    void display() {
+        if (isEmpty()) {
+            cout &lt;&lt; "Stack: [ empty ]" &lt;&lt; endl;
+            return;
+        }
+        cout &lt;&lt; "Stack (top -&gt; bottom): ";
+        Node* current = top;
+        while (current != nullptr) {
+            cout &lt;&lt; current-&gt;data &lt;&lt; " ";
+            current = current-&gt;next;
+        }
+        cout &lt;&lt; endl;
+    }
+};
+
+// ================= MAIN =================
+int main() {
+    LinkedStack s;
+
+    s.push(10);
+    s.push(20);
+    s.push(30);
+    s.display();                             // 30 20 10
+
+    cout &lt;&lt; "Top   : " &lt;&lt; s.peek() &lt;&lt; endl;   // 30
+    cout &lt;&lt; "Size  : " &lt;&lt; s.size() &lt;&lt; endl;   // 3
+
+    cout &lt;&lt; "Popped: " &lt;&lt; s.pop() &lt;&lt; endl;    // 30
+    s.display();                             // 20 10
+
+    return 0;
+}</code></pre>
+  </div>
+
+  <h3>⚖️ Array vs Linked List — Which Should You Use?</h3>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Aspect</th><th>Array-Based Stack</th><th>Linked-List Stack</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Size</td><td>Fixed at compile time</td><td>Grows dynamically</td></tr>
+        <tr><td>Overflow possible?</td><td><span class="pill red">Yes</span> (when full)</td><td><span class="pill green">Only when RAM is exhausted</span></td></tr>
+        <tr><td>push / pop time</td><td><span class="pill green">O(1)</span></td><td><span class="pill green">O(1)</span></td></tr>
+        <tr><td>Memory per element</td><td>4 bytes (just the int)</td><td>4 bytes + 8 bytes pointer = 12 bytes</td></tr>
+        <tr><td>Memory locality (cache)</td><td><span class="pill green">Excellent (contiguous)</span></td><td><span class="pill amber">Poor (scattered on heap)</span></td></tr>
+        <tr><td>Risk of leaks</td><td>None</td><td>High — you must <code class="inline">delete</code></td></tr>
+        <tr><td>Best for</td><td>Known, small, fixed sizes</td><td>Unknown or large sizes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout danger">
+    <span class="h">🚨 The #1 student mistake</span>
+    Forgetting <code class="inline">delete temp;</code> inside <code class="inline">pop()</code>. Without it, every pop leaks memory.
+    A loop of a million pushes and pops will eat gigabytes. <strong>Always delete what you remove.</strong>
+  </div>
+</section>
+
+<!-- ============================================================
+     6. STL
+     ============================================================ -->
+<section id="stl">
+  <h2><span class="sec-num">6</span> The Easy Way — C++ STL <code class="inline">std::stack</code></h2>
+  <p class="lede">In real projects you don't write your own stack — you use the Standard Template Library. Here's how.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <span class="fname"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> stl_stack.cpp</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;          // &lt;-- the STL stack header
+using namespace std;
+
+int main() {
+    stack&lt;int&gt; s;                 // declare a stack of integers
+
+    // ---------- PUSH ----------
+    s.push(10);
+    s.push(20);
+    s.push(30);
+
+    // ---------- TOP (this is STL's name for peek) ----------
+    cout &lt;&lt; "Top  : " &lt;&lt; s.top()  &lt;&lt; endl;   // 30
+    cout &lt;&lt; "Size : " &lt;&lt; s.size() &lt;&lt; endl;   // 3
+
+    // ---------- POP (returns void in STL!) ----------
+    s.pop();                                   // removes 30, returns nothing
+    cout &lt;&lt; "New top after pop: " &lt;&lt; s.top() &lt;&lt; endl;  // 20
+
+    // ---------- EMPTY ----------
+    cout &lt;&lt; "Empty? " &lt;&lt; (s.empty() ? "Yes" : "No") &lt;&lt; endl;
+
+    // ---------- Print the whole stack (must pop to see everything) ----------
+    cout &lt;&lt; "Contents: ";
+    while (!s.empty()) {
+        cout &lt;&lt; s.top() &lt;&lt; " ";
+        s.pop();
+    }
+    cout &lt;&lt; endl;
+
+    return 0;
+}</code></pre>
+  </div>
+
+  <h3>📋 STL Stack Cheat-Sheet</h3>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>STL Call</th><th>Meaning</th><th>Note</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">stack&lt;int&gt; s;</td><td>Create an empty stack of ints</td><td>Template — works with any type</td></tr>
+        <tr><td class="mono">s.push(x);</td><td>Add <code class="inline">x</code> on top</td><td>O(1)</td></tr>
+        <tr><td class="mono">s.pop();</td><td>Remove the top element</td><td><strong>Returns void!</strong> Call <code class="inline">top()</code> first if you need the value</td></tr>
+        <tr><td class="mono">s.top();</td><td>Read the top element</td><td>This is STL's <code class="inline">peek()</code></td></tr>
+        <tr><td class="mono">s.empty();</td><td><code class="inline">true</code> if empty</td><td>Always check before <code class="inline">pop()</code>/<code class="inline">top()</code></td></tr>
+        <tr><td class="mono">s.size();</td><td>Number of elements</td><td>Returns <code class="inline">size_t</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <span class="h">⚠️ The STL trap that catches everyone</span>
+    <code class="inline">s.pop()</code> does <strong>not</strong> return the removed value. If you want it, you must write:<br>
+    <code class="inline">int v = s.top(); s.pop();</code> &nbsp;— in that order.
+  </div>
+</section>
+
+<!-- ============================================================
+     7. APPLICATIONS
+     ============================================================ -->
+<section id="applications">
+  <h2><span class="sec-num">7</span> Applications — Where Stacks Earn Their Keep</h2>
+  <p class="lede">Stacks are not academic toys. Here are the four applications you'll meet most often.</p>
+
+  <!-- ===== 7.1 Balanced Brackets ===== -->
+  <h3>7.1 ✅ Balanced Brackets — Interactive Demo</h3>
+  <p>
+    Every compiler in the world uses a stack for this. Type any expression with <code class="inline">()</code>,
+    <code class="inline">[]</code>, <code class="inline">{}</code> and step through the algorithm character by character.
+  </p>
+
+  <div class="ctrl-row">
+    <input type="text" id="parenInput" value="{[A+(B*C)]-D}">
+    <button class="btn btn-primary" id="btnCheckParen">🔍 Check</button>
+  </div>
+
+  <div class="paren-display" id="parenDisplay">Type an expression and press Check</div>
+
+  <h4>Stack contents (bottom → top):</h4>
+  <div class="paren-stack-box" id="parenStackBox">
+    <span class="empty-stack">stack is empty</span>
+  </div>
+
+  <div class="step-note" id="parenNote">Waiting for input…</div>
+
+  <div class="step-ctrls">
+    <button class="btn btn-ghost" id="btnPrevStep">◀ Previous</button>
+    <button class="btn btn-primary" id="btnNextStep">Next Step ▶</button>
+    <span class="step-count" id="stepCount">Step 0 / 0</span>
+  </div>
+
+  <h4>💻 The C++ Code Behind It</h4>
+  <div class="code-wrap">
+    <div class="code-bar">
+      <span class="fname"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> balanced_brackets.cpp</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+#include &lt;string&gt;
+using namespace std;
+
+bool isBalanced(string expr) {
+    stack&lt;char&gt; st;
+
+    for (char c : expr) {
+
+        // 1. Opening bracket -&gt; push it and hope to match it later
+        if (c == '(' || c == '[' || c == '{') {
+            st.push(c);
+        }
+        // 2. Closing bracket -&gt; it MUST match whatever is on top
+        else if (c == ')' || c == ']' || c == '}') {
+
+            if (st.empty()) return false;        // nothing to match -&gt; unbalanced
+
+            char topChar = st.top();
+
+            if ((c == ')' &amp;&amp; topChar != '(') ||
+                (c == ']' &amp;&amp; topChar != '[') ||
+                (c == '}' &amp;&amp; topChar != '{')) {
+                return false;                    // wrong type of bracket -&gt; unbalanced
+            }
+
+            st.pop();                            // matched! remove it
+        }
+        // 3. Any other character (letters, digits, operators) -&gt; just ignore
+    }
+
+    // 4. At the very end, the stack MUST be empty
+    return st.empty();
+}
+
+int main() {
+    string tests[] = {"{[A+(B*C)]-D}", "(A+B)", "((A+B)", "A+B)", "{[}]"};
+
+    for (string t : tests) {
+        cout &lt;&lt; (isBalanced(t) ? "BALANCED   " : "UNBALANCED ") &lt;&lt; "  " &lt;&lt; t &lt;&lt; endl;
+    }
+    return 0;
+}</code></pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="fname"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> output</span><button class="copy-btn">Copy</button></div>
+<pre><code>BALANCED     {[A+(B*C)]-D}
+BALANCED     (A+B)
+UNBALANCED   ((A+B)
+UNBALANCED   A+B)
+UNBALANCED   {[}]</code></pre>
+  </div>
+
+  <!-- ===== 7.2 Infix to Postfix ===== -->
+  <h3>7.2 🔄 Infix → Postfix Conversion</h3>
+  <p>
+    Humans write <code class="inline">A + B</code> (infix). Computers prefer <code class="inline">A B +</code> (postfix),
+    because postfix needs <strong>no parentheses and no precedence rules</strong> when evaluating.
+    A stack of operators makes the conversion trivial.
+  </p>
+
+  <div class="callout info">
+    <span class="h">📏 Operator precedence used</span>
+    <code class="inline">^</code> (3) &gt; <code class="inline">* / %</code> (2) &gt; <code class="inline">+ -</code> (1)
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <span class="fname"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> infix_to_postfix.cpp</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+#include &lt;string&gt;
+#include &lt;cctype&gt;
+using namespace std;
+
+// Returns how "powerful" an operator is
+int precedence(char op) {
+    if (op == '^')                          return 3;
+    if (op == '*' || op == '/' || op == '%') return 2;
+    if (op == '+' || op == '-')             return 1;
+    return 0;   // not an operator
+}
+
+string infixToPostfix(string infix) {
+    stack&lt;char&gt; st;          // stack of OPERATORS
+    string postfix = "";     // the result we build
+
+    for (char c : infix) {
+
+        if (isalnum(c)) {                    // RULE 1: operand -&gt; output directly
+            postfix += c;
+        }
+        else if (c == '(') {                 // RULE 2: '(' -&gt; push it
+            st.push(c);
+        }
+        else if (c == ')') {                 // RULE 3: ')' -&gt; pop until '('
+            while (!st.empty() &amp;&amp; st.top() != '(') {
+                postfix += st.top();
+                st.pop();
+            }
+            if (!st.empty()) st.pop();       // discard the '('
+        }
+        else {                               // RULE 4: operator
+            // pop everything with higher-or-equal precedence first
+            while (!st.empty() &amp;&amp; precedence(st.top()) &gt;= precedence(c)) {
+                postfix += st.top();
+                st.pop();
+            }
+            st.push(c);
+        }
+    }
+
+    // RULE 5: drain whatever is left on the stack
+    while (!st.empty()) {
+        postfix += st.top();
+        st.pop();
+    }
+    return postfix;
+}
+
+int main() {
+    string infix = "A+B*(C-D)";
+    cout &lt;&lt; "Infix   : " &lt;&lt; infix &lt;&lt; endl;
+    cout &lt;&lt; "Postfix : " &lt;&lt; infixToPostfix(infix) &lt;&lt; endl;
+    return 0;
+}</code></pre>
+  </div>
+
+  <h4>Trace of <code class="inline">A+B*(C-D)</code></h4>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Char</th><th>Action</th><th>Stack (bottom→top)</th><th>Postfix so far</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">A</td><td>operand → output</td><td class="mono">[ ]</td><td class="mono">A</td></tr>
+        <tr><td class="mono">+</td><td>push</td><td class="mono">[ + ]</td><td class="mono">A</td></tr>
+        <tr><td class="mono">B</td><td>operand → output</td><td class="mono">[ + ]</td><td class="mono">AB</td></tr>
+        <tr><td class="mono">*</td><td>prec(*) &gt; prec(+) → push</td><td class="mono">[ + * ]</td><td class="mono">AB</td></tr>
+        <tr><td class="mono">(</td><td>push</td><td class="mono">[ + * ( ]</td><td class="mono">AB</td></tr>
+        <tr><td class="mono">C</td><td>operand → output</td><td class="mono">[ + * ( ]</td><td class="mono">ABC</td></tr>
+        <tr><td class="mono">-</td><td>push</td><td class="mono">[ + * ( - ]</td><td class="mono">ABC</td></tr>
+        <tr><td class="mono">D</td><td>operand → output</td><td class="mono">[ + * ( - ]</td><td class="mono">ABCD</td></tr>
+        <tr><td class="mono">)</td><td>pop until '('</td><td class="mono">[ + * ]</td><td class="mono">ABCD-</td></tr>
+        <tr><td class="mono">end</td><td>drain the stack</td><td class="mono">[ ]</td><td class="mono">ABCD-*+</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>Result:</strong> <code class="inline">ABCD-*+</code> ✔</p>
+
+  <!-- ===== 7.3 Other applications ===== -->
+  <h3>7.3 🔁 Reverse a String / Check Palindrome</h3>
+  <p>Push every character, then pop them all — they come out backwards. Two lines of logic, one elegant result.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar">
+      <span class="fname"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> reverse_string.cpp</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+#include &lt;string&gt;
+using namespace std;
+
+string reverseString(string s) {
+    stack&lt;char&gt; st;
+
+    // Step 1: push every character
+    for (char c : s) {
+        st.push(c);
+    }
+
+    // Step 2: pop them all - they come out in reverse order
+    string reversed = "";
+    while (!st.empty()) {
+        reversed += st.top();
+        st.pop();
+    }
+    return reversed;
+}
+
+bool isPalindrome(string s) {
+    return s == reverseString(s);
+}
+
+int main() {
+    string word = "racecar";
+    cout &lt;&lt; "Original  : " &lt;&lt; word &lt;&lt; endl;
+    cout &lt;&lt; "Reversed  : " &lt;&lt; reverseString(word) &lt;&lt; endl;
+    cout &lt;&lt; "Palindrome: " &lt;&lt; (isPalindrome(word) ? "Yes" : "No") &lt;&lt; endl;
+    return 0;
+}</code></pre>
+  </div>
+
+  <h3>7.4 ↩️ Undo / Redo Feature</h3>
+  <div class="code-wrap">
+    <div class="code-bar">
+      <span class="fname"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span> undo_demo.cpp</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;stack&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    stack&lt;string&gt; undoStack;   // every action goes here
+    string document = "";
+
+    auto type = [&amp;](string text) {      // helper: simulate typing
+        undoStack.push(document);       // save the PREVIOUS state
+        document += text;
+        cout &lt;&lt; "Typed \"" &lt;&lt; text &lt;&lt; "\"  -&gt; \"" &lt;&lt; document &lt;&lt; "\"" &lt;&lt; endl;
+    };
+
+    auto undo = [&amp;]() {                // helper: simulate Ctrl+Z
+        if (undoStack.empty()) {
+            cout &lt;&lt; "Nothing to undo!" &lt;&lt; endl;
+            return;
+        }
+        document = undoStack.top();     // restore the previous state
+        undoStack.pop();
+        cout &lt;&lt; "UNDO        -&gt; \"" &lt;&lt; document &lt;&lt; "\"" &lt;&lt; endl;
+    };
+
+    type("Hello");
+    type(", World");
+    type("!");
+    undo();     // removes "!"
+    undo();     // removes ", World"
+    undo();     // removes "Hello"
+    undo();     // -&gt; Nothing to undo!
+
+    return 0;
+}</code></pre>
+  </div>
+
+  <h3>📚 Other Classic Stack Applications</h3>
+  <ul>
+    <li><strong>Function call stack</strong> — every function call pushes a stack frame; returning pops it. This is why infinite recursion causes a "stack overflow".</li>
+    <li><strong>Depth-First Search (DFS)</strong> — graph/tree traversal uses a stack (or recursion) to remember where to backtrack.</li>
+    <li><strong>Postfix expression evaluation</strong> — push operands, and when you hit an operator, pop two, compute, push the result.</li>
+    <li><strong>Backtracking algorithms</strong> — mazes, Sudoku solvers, N-Queens.</li>
+    <li><strong>Syntax parsing</strong> — compilers and interpreters.</li>
+    <li><strong>Browser history</strong> — the back button is literally a stack of URLs.</li>
+  </ul>
+</section>
+
+<!-- ============================================================
+     8. COMPLEXITY
+     ============================================================ -->
+<section id="complexity">
+  <h2><span class="sec-num">8</span> Complexity Summary — The Exam Table</h2>
+  <p class="lede">Memorise this table. It appears in every quiz, every midterm, and every interview.</p>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Operation</th><th>Array-Based</th><th>Linked-List-Based</th><th>STL <code class="inline">std::stack</code></th><th>Why?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono"><strong>push(x)</strong></td><td><span class="pill green">O(1)</span></td><td><span class="pill green">O(1)</span></td><td><span class="pill green">O(1)</span></td><td>Just a pointer move / one node insert</td></tr>
+        <tr><td class="mono"><strong>pop()</strong></td><td><span class="pill green">O(1)</span></td><td><span class="pill green">O(1)</span></td><td><span class="pill green">O(1)</span></td><td>Just a pointer move / one node delete</td></tr>
+        <tr><td class="mono"><strong>peek() / top()</strong></td><td><span class="pill green">O(1)</span></td><td><span class="pill green">O(1)</span></td><td><span class="pill green">O(1)</span></td><td>Direct array index or head dereference</td></tr>
+        <tr><td class="mono"><strong>isEmpty()</strong></td><td><span class="pill green">O(1)</span></td><td><span class="pill green">O(1)</span></td><td><span class="pill green">O(1)</span></td><td>One comparison</td></tr>
+        <tr><td class="mono"><strong>isFull()</strong></td><td><span class="pill green">O(1)</span></td><td><span class="pill amber">N/A</span></td><td><span class="pill amber">N/A</span></td><td>Only meaningful for fixed-size arrays</td></tr>
+        <tr><td class="mono"><strong>size()</strong></td><td><span class="pill green">O(1)</span></td><td><span class="pill amber">O(n)</span></td><td><span class="pill green">O(1)</span></td><td>Array: <code class="inline">top+1</code>. Linked list: must walk the chain (unless you keep a counter)</td></tr>
+        <tr><td class="mono"><strong>search(x)</strong></td><td><span class="pill red">O(n)</span></td><td><span class="pill red">O(n)</span></td><td><span class="pill red">O(n)</span></td><td>Stacks are not designed for searching — you must pop to look deeper</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout tip">
+    <span class="h">💡 The takeaway</span>
+    If your algorithm needs fast search, a stack is the <strong>wrong</strong> tool.
+    Stacks are brilliant at <strong>order-sensitive, one-end-only</strong> work: reversing, matching, backtracking, and undo.
+  </div>
+
+  <h3>🧮 Space Complexity</h3>
+  <ul>
+    <li><strong>Array-based:</strong> <code class="inline">O(n)</code> where n is the declared capacity (even if the stack is nearly empty, the memory is reserved).</li>
+    <li><strong>Linked-list-based:</strong> <code class="inline">O(k)</code> where k is the number of elements <em>currently</em> in the stack — plus 8 bytes of pointer overhead per node.</li>
+  </ul>
+</section>
+
+<!-- ============================================================
+     9. LAB TASKS
+     ============================================================ -->
+<section id="tasks">
+  <h2><span class="sec-num">9</span> Lab Tasks — Your Turn</h2>
+  <p class="lede">Complete these in order. Tasks 1–3 are compulsory; 4–6 are for the fast finishers.</p>
+
+  <div class="task">
+    <div class="th">📝 Task 1 — Menu-Driven Array Stack <span class="pill blue">Compulsory</span></div>
+    <div class="tb">
+      Write a complete C++ program with an array-based <code class="inline">Stack</code> class of capacity 10.
+      Provide a menu that keeps running until the user chooses Exit:
+      <br><code class="inline">1. Push &nbsp; 2. Pop &nbsp; 3. Peek &nbsp; 4. Display &nbsp; 5. isEmpty &nbsp; 6. isFull &nbsp; 7. Exit</code>
+      <br>Handle overflow and underflow gracefully with clear messages.
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="th">📝 Task 2 — Linked-List Stack <span class="pill blue">Compulsory</span></div>
+    <div class="tb">
+      Re-implement the same menu using a singly linked list. Make sure you
+      <code class="inline">delete</code> every node in <code class="inline">pop()</code> and free the entire stack in the destructor.
+      Run it under <code class="inline">valgrind</code> (or just reason carefully) to confirm there are no memory leaks.
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="th">📝 Task 3 — Balanced Brackets Checker <span class="pill blue">Compulsory</span></div>
+    <div class="tb">
+      Read a line of text from the user containing <code class="inline">()</code>, <code class="inline">[]</code>, <code class="inline">{}</code>.
+      Print <strong>"Balanced"</strong> or <strong>"Not Balanced"</strong>. If unbalanced, also print the
+      <em>index</em> of the first offending character.
+      <br><em>Test cases:</em> <code class="inline">{[()]}</code> ✔ &nbsp; <code class="inline">([)]</code> ✘ &nbsp; <code class="inline">((</code> ✘ &nbsp; <code class="inline">)</code> ✘
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="th">📝 Task 4 — Palindrome Checker <span class="pill amber">Bonus</span></div>
+    <div class="tb">
+      Read a string, push all characters onto a stack, then compare the popped characters with the original.
+      Report whether it's a palindrome. Ignore spaces and case (e.g., <code class="inline">"A man a plan a canal Panama"</code> ✔).
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="th">📝 Task 5 — Infix to Postfix + Evaluation <span class="pill amber">Bonus</span></div>
+    <div class="tb">
+      (a) Convert an infix expression to postfix using a stack of operators.<br>
+      (b) Then <em>evaluate</em> the postfix expression using a second stack of operands.
+      Support <code class="inline">+ - * /</code> and single-digit numbers. Example: <code class="inline">3+4*2</code> → postfix <code class="inline">342*+</code> → result <code class="inline">11</code>.
+    </div>
+  </div>
+
+  <div class="task">
+    <div class="th">📝 Task 6 — Two Stacks in One Array <span class="pill red">Challenge</span></div>
+    <div class="tb">
+      Implement <strong>two</strong> stacks inside a <strong>single</strong> array of size N, so that neither overflows
+      until the total number of elements reaches N. <em>Hint: one stack grows from index 0 upward, the other grows
+      from index N-1 downward. They meet in the middle.</em>
+    </div>
+  </div>
+
+  <h3>🎤 Viva / Exam Questions — Be Ready</h3>
+  <ol>
+    <li>Why is a stack called a LIFO structure? Give one real-world example.</li>
+    <li>What is the value of <code class="inline">top</code> for an empty array-based stack, and why that value?</li>
+    <li>Differentiate between <code class="inline">pop()</code> and <code class="inline">peek()</code>.</li>
+    <li>What is stack overflow? Stack underflow?</li>
+    <li>Why is <code class="inline">push()</code> O(1) in a linked-list stack but O(n) for insertion at the tail?</li>
+    <li>Can you search for an element in a stack without destroying it? How?</li>
+    <li>What does <code class="inline">std::stack::pop()</code> return in C++? Why is that a common bug source?</li>
+    <li>Explain how a function call stack causes a "stack overflow" during infinite recursion.</li>
+    <li>Convert <code class="inline">(A+B)*(C-D)</code> to postfix. Show the stack at each step.</li>
+    <li>Which is better for an unknown number of elements: array stack or linked stack? Justify.</li>
+  </ol>
+</section>
+
+<!-- ============================================================
+     10. QUIZ
+     ============================================================ -->
+<section id="quiz">
+  <h2><span class="sec-num">10</span> Self-Check Quiz</h2>
+  <p class="lede">Click an option. You'll get instant feedback with an explanation. No marks, no pressure — just learning.</p>
+  <div id="quizContainer"></div>
+  <div class="callout tip" id="quizScoreBox" style="display:none;">
+    <span class="h">🏁 Quiz complete!</span>
+    <span id="quizScoreText"></span>
+  </div>
+</section>
+
+<!-- ============================================================
+     SUMMARY
+     ============================================================ -->
+<section id="summary">
+  <h2><span class="sec-num">✓</span> One-Page Summary</h2>
+  <div class="callout">
+    <span class="h">🧠 Stack — The Whole Idea in 8 Lines</span>
+    <ol style="margin-bottom:0;">
+      <li>A stack is a <strong>linear</strong> data structure with <strong>one open end</strong> called the <strong>top</strong>.</li>
+      <li>It follows <strong>LIFO</strong>: Last In, First Out.</li>
+      <li>Core operations: <code class="inline">push</code>, <code class="inline">pop</code>, <code class="inline">peek</code>, <code class="inline">isEmpty</code>, <code class="inline">isFull</code>.</li>
+      <li>All core operations are <strong>O(1)</strong>.</li>
+      <li><strong>Array implementation:</strong> fast, cache-friendly, but fixed size → can overflow.</li>
+      <li><strong>Linked-list implementation:</strong> dynamic size, but uses extra memory for pointers.</li>
+      <li>In C++, just use <code class="inline">#include &lt;stack&gt;</code> and <code class="inline">std::stack&lt;T&gt;</code>.</li>
+      <li>Used everywhere: undo, browser back, bracket matching, postfix conversion, DFS, function calls.</li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="fname">FAST — National University of Computer &amp; Emerging Sciences</div>
+  <div class="fsmall">Peshawar Campus • Department of Computer Science • Data Structures Lab</div>
+  <div class="fsmall" style="margin-top:10px;">
+    Prepared by <strong style="color:#fff;">Hamza Raziq Khan</strong> &nbsp;•&nbsp; Topic: Stack &nbsp;•&nbsp; Language: C++ &nbsp;•&nbsp; Duration: 3 Hours
+  </div>
+</footer>
+
+<script>
+/* ================================================================
+   1. SYNTAX HIGHLIGHTER
+   ================================================================ */
+function escHTML(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+const CPP_RE = new RegExp(
+  '(\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)' +                                   // 1 comment
+  '|("(?:\\\\.|[^"\\\\])*"|\'(?:\\\\.|[^\'\\\\])*\')' +                        // 2 string/char
+  '|(^[ \\t]*#[ \\t]*[a-zA-Z]+)' +                                             // 3 preprocessor
+  '|(\\b(?:int|char|float|double|bool|void|class|struct|public|private|protected|' +
+     'return|if|else|while|for|do|switch|case|break|continue|new|delete|true|false|' +
+     'nullptr|const|static|template|typename|using|namespace|try|catch|throw|this|' +
+     'operator|unsigned|long|short|auto|size_t)\\b)' +                          // 4 keyword
+  '|(\\b\\d+(?:\\.\\d+)?\\b)' +                                                // 5 number
+  '|(\\b[A-Za-z_]\\w*(?=\\s*\\())',                                            // 6 function call
+  'gm'
+);
+
+function highlightCPP(code){
+  return escHTML(code).replace(CPP_RE, function(m, cm, st, pp, kw, num, fn){
+    if (cm)  return '<span class="c-cm">'  + cm  + '</span>';
+    if (st)  return '<span class="c-st">'  + st  + '</span>';
+    if (pp)  return '<span class="c-pp">'  + pp  + '</span>';
+    if (kw)  return '<span class="c-kw">'  + kw  + '</span>';
+    if (num) return '<span class="c-num">' + num + '</span>';
+    if (fn)  return '<span class="c-fn">'  + fn  + '</span>';
+    return m;
+  });
+}
+
+document.querySelectorAll('pre code').forEach(function(block){
+  block.innerHTML = highlightCPP(block.textContent);
+});
+
+/* ================================================================
+   2. COPY BUTTONS
+   ================================================================ */
+document.querySelectorAll('.copy-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    const wrap = btn.closest('.code-wrap');
+    const code = wrap ? wrap.querySelector('pre code') : null;
+    if (!code) return;
+    const text = code.textContent;
+    const done = function(){
+      const old = btn.textContent;
+      btn.textContent = '✓ Copied!';
+      setTimeout(function(){ btn.textContent = old; }, 1400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text); done(); });
+    } else {
+      fallbackCopy(text); done();
+    }
+  });
+});
+
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ================================================================
+   3. STACK VISUALIZER
+   ================================================================ */
+const CAP = 6;
+let stackData = [];
+
+const els = {
+  slots:      document.getElementById('stackSlots'),
+  log:        document.getElementById('log'),
+  pushValue:  document.getElementById('pushValue'),
+  statSize:   document.getElementById('statSize'),
+  statTop:    document.getElementById('statTop'),
+  statEmpty:  document.getElementById('statEmpty')
+};
+
+function logMsg(text, cls){
+  const line = document.createElement('div');
+  line.className = cls || '';
+  line.textContent = '› ' + text;
+  els.log.appendChild(line);
+  els.log.scrollTop = els.log.scrollHeight;
+  // keep the log from growing forever
+  while (els.log.children.length > 60) els.log.removeChild(els.log.firstChild);
+}
+
+function renderStack(animateTop){
+  els.slots.innerHTML = '';
+  for (let i = CAP - 1; i >= 0; i--){
+    const filled  = i < stackData.length;
+    const isTop   = (i === stackData.length - 1);
+
+    const row = document.createElement('div');
+    row.className = 'slot' + (filled ? ' filled' : '') + (isTop ? ' top' : '');
+
+    const idx = document.createElement('span');
+    idx.className = 'idx';
+    idx.textContent = '[' + i + ']';
+
+    const cell = document.createElement('span');
+    cell.className = 'cell';
+    cell.textContent = filled ? stackData[i] : '';
+
+    row.appendChild(idx);
+    row.appendChild(cell);
+
+    if (isTop){
+      const lbl = document.createElement('span');
+      lbl.className = 'toplabel';
+      lbl.textContent = '◀ top';
+      row.appendChild(lbl);
+    }
+
+    els.slots.appendChild(row);
+  }
+
+  // stats
+  els.statSize.textContent  = stackData.length;
+  els.statTop.textContent   = stackData.length ? stackData[stackData.length - 1] : '—';
+  els.statEmpty.textContent = stackData.length ? 'No' : 'Yes';
+
+  // little pop-in animation on the newest element
+  if (animateTop){
+    const topSlot = els.slots.querySelector('.slot.top');
+    if (topSlot){
+      topSlot.classList.add('animate');
+      setTimeout(function(){ topSlot.classList.remove('animate'); }, 340);
+    }
+  }
+}
+
+function doPush(){
+  let raw = els.pushValue.value.trim();
+  let value = raw === '' ? Math.floor(Math.random() * 90) + 10 : Number(raw);
+  if (isNaN(value)) value = Math.floor(Math.random() * 90) + 10;
+
+  if (stackData.length >= CAP){
+    logMsg('push(' + value + ') FAILED → Stack Overflow! (capacity is ' + CAP + ')', 'err');
+    return;
+  }
+  stackData.push(value);
+  renderStack(true);
+  logMsg('push(' + value + ')  →  top = ' + (stackData.length - 1) + '  |  size = ' + stackData.length, 'ok');
+
+  els.pushValue.value = Math.floor(Math.random() * 90) + 10;
+}
+
+function doPop(){
+  if (stackData.length === 0){
+    logMsg('pop() FAILED → Stack Underflow! The stack is empty.', 'err');
+    return;
+  }
+  const removed = stackData.pop();
+  renderStack(false);
+  logMsg('pop()  →  returned ' + removed + '  |  top = ' + (stackData.length - 1) + '  |  size = ' + stackData.length, 'warnl');
+}
+
+function doPeek(){
+  if (stackData.length === 0){
+    logMsg('peek() FAILED → the stack is empty.', 'err');
+    return;
+  }
+  logMsg('peek()  →  ' + stackData[stackData.length - 1] + '  (the element was NOT removed)', 'info');
+}
+
+function doIsEmpty(){
+  logMsg('isEmpty()  →  ' + (stackData.length === 0 ? 'true' : 'false'), 'info');
+}
+
+function doIsFull(){
+  logMsg('isFull()  →  ' + (stackData.length >= CAP ? 'true' : 'false') + '   (size ' + stackData.length + ' / ' + CAP + ')', 'info');
+}
+
+function doClear(){
+  stackData = [];
+  renderStack(false);
+  logMsg('clear()  →  the stack has been emptied.', 'hl');
+}
+
+document.getElementById('btnPush').addEventListener('click', doPush);
+document.getElementById('btnPop').addEventListener('click', doPop);
+document.getElementById('btnPeek').addEventListener('click', doPeek);
+document.getElementById('btnEmpty').addEventListener('click', doIsEmpty);
+document.getElementById('btnFull').addEventListener('click', doIsFull);
+document.getElementById('btnClear').addEventListener('click', doClear);
+
+els.pushValue.addEventListener('keydown', function(e){
+  if (e.key === 'Enter') doPush();
+});
+
+// initial state
+renderStack(false);
+logMsg('Ready. This stack has capacity ' + CAP + '. Try pushing a few values!', 'hl');
+logMsg('Remember: the orange cell is the TOP — only it can be popped.', 'info');
+
+/* ================================================================
+   4. BALANCED BRACKETS — STEP PLAYER
+   ================================================================ */
+let parenString = '';
+let parenSteps  = [];
+let parenIndex  = 0;
+
+const pEls = {
+  input:    document.getElementById('parenInput'),
+  display:  document.getElementById('parenDisplay'),
+  stackBox: document.getElementById('parenStackBox'),
+  note:     document.getElementById('parenNote'),
+  counter:  document.getElementById('stepCount'),
+  prev:     document.getElementById('btnPrevStep'),
+  next:     document.getElementById('btnNextStep'),
+  check:    document.getElementById('btnCheckParen')
+};
+
+function computeParenSteps(s){
+  const steps = [];
+  const st = [];
+  const pairs = { ')': '(', ']': '[', '}': '{' };
+  const opens = '([{';
+
+  for (let i = 0; i < s.length; i++){
+    const c = s[i];
+
+    if (opens.indexOf(c) !== -1){
+      st.push(c);
+      steps.push({ i: i, c: c, stack: st.slice(), kind: 'push',
+                   note: "'" + c + "' is an OPENING bracket → push it onto the stack." });
+
+    } else if (pairs[c]){
+      if (st.length === 0){
+        steps.push({ i: i, c: c, stack: [], kind: 'error',
+                     note: "Found '" + c + "' but the stack is EMPTY → nothing to match it. UNBALANCED ✘" });
+        return { steps: steps, ok: false };
+      }
+      const topChar = st[st.length - 1];
+      if (topChar !== pairs[c]){
+        steps.push({ i: i, c: c, stack: st.slice(), kind: 'error',
+                     note: "Found '" + c + "' but the top of the stack is '" + topChar +
+                           "'. They do not match → UNBALANCED ✘" });
+        return { steps: steps, ok: false };
+      }
+      st.pop();
+      steps.push({ i: i, c: c, stack: st.slice(), kind: 'pop',
+                   note: "'" + c + "' MATCHES the top '" + topChar + "' → pop it off. So far so good ✓" });
+
+    } else {
+      steps.push({ i: i, c: c, stack: st.slice(), kind: 'skip',
+                   note: "'" + c + "' is not a bracket → ignore it completely." });
+    }
+  }
+
+  const ok = (st.length === 0);
+  steps.push({
+    i: s.length, c: '', stack: st.slice(),
+    kind: ok ? 'done' : 'error',
+    note: ok
+      ? 'End of input reached and the stack is EMPTY → the expression is BALANCED ✓'
+      : 'End of input reached but the stack still contains ' + st.length +
+        ' unmatched opening bracket(s) → UNBALANCED ✘'
+  });
+
+  return { steps: steps, ok: ok };
+}
+
+function renderParenString(){
+  let html = '';
+  for (let i = 0; i < parenString.length; i++){
+    const ch = parenString[i];
+    let cls = '';
+    if (i === parenIndex){ cls = 'cur'; }
+    else if (i < parenIndex){ cls = 'done'; }
+    // escape
+    const safe = ch.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/ /g,'&nbsp;');
+    html += '<span class="' + cls + '">' + safe + '</span>';
+  }
+  pEls.display.innerHTML = html || '<em style="color:#94a3b8;font-size:16px;">empty expression</em>';
+}
+
+function renderParenStep(){
+  if (parenSteps.length === 0) return;
+
+  const step = parenSteps[parenIndex];
+
+  // highlight the current character
+  renderParenString();
+  if (step.i < parenString.length){
+    parenIndex = step.i;
+    renderParenString();
+  }
+
+  // render the stack
+  if (step.stack.length === 0){
+    pEls.stackBox.innerHTML = '<span class="empty-stack">stack is empty</span>';
+  } else {
+    let h = '';
+    step.stack.forEach(function(ch, k){
+      const isTop = (k === step.stack.length - 1);
+      h += '<span class="chip-el' + (isTop ? ' topchip' : '') + '">' + ch + '</span>';
+    });
+    pEls.stackBox.innerHTML = h;
+  }
+
+  // note
+  pEls.note.textContent = step.note;
+  pEls.note.className = 'step-note' +
+    (step.kind === 'error' ? ' err' : (step.kind === 'done' ? ' ok' : ''));
+
+  // counter + buttons
+  pEls.counter.textContent = 'Step ' + (parenIndex + 1) + ' / ' + parenSteps.length;
+  pEls.prev.disabled = (parenIndex === 0);
+  pEls.next.disabled = (parenIndex === parenSteps.length - 1);
+}
+
+function runParen(){
+  parenString = pEls.input.value;
+  const result = computeParenSteps(parenString);
+  parenSteps = result.steps;
+  parenIndex = 0;
+  renderParenStep();
+}
+
+pEls.check.addEventListener('click', runParen);
+
+pEls.prev.addEventListener('click', function(){
+  if (parenIndex > 0){ parenIndex--; renderParenStep(); }
+});
+
+pEls.next.addEventListener('click', function(){
+  if (parenIndex < parenSteps.length - 1){ parenIndex++; renderParenStep(); }
+});
+
+pEls.input.addEventListener('keydown', function(e){
+  if (e.key === 'Enter') runParen();
+});
+
+// auto-run once on load
+runParen();
+
+/* ================================================================
+   5. QUIZ
+   ================================================================ */
+const QUIZ = [
+  {
+    q: 'A stack follows which principle?',
+    opts: ['FIFO — First In, First Out', 'LIFO — Last In, First Out', 'LILO — Last In, Last Out', 'Random access'],
+    answer: 1,
+    why: 'A stack is LIFO: the last element you push is the first element you pop.'
+  },
+  {
+    q: 'Which operation ADDS an element to a stack?',
+    opts: ['pop()', 'peek()', 'push()', 'enqueue()'],
+    answer: 2,
+    why: 'push() adds to the top. pop() removes from the top. peek() only looks.'
+  },
+  {
+    q: 'What is the time complexity of push() and pop() in an array-based stack?',
+    opts: ['O(n)', 'O(log n)', 'O(1)', 'O(n²)'],
+    answer: 2,
+    why: 'Both only move the top index by one — constant time, no shifting of elements.'
+  },
+  {
+    q: 'You push 1, 2, 3 then call pop() twice. What is now on top?',
+    opts: ['3', '2', '1', 'The stack is empty'],
+    answer: 2,
+    why: 'push 1, 2, 3 → stack is [1,2,3] with 3 on top. pop() removes 3, pop() removes 2. Now 1 is on top.'
+  },
+  {
+    q: 'Stack Overflow occurs when…',
+    opts: ['You pop from an empty stack', 'You push onto a full stack', 'You call peek() on an empty stack', 'You declare too many variables'],
+    answer: 1,
+    why: 'Overflow = pushing onto a FULL stack. Underflow = popping from an EMPTY stack.'
+  },
+  {
+    q: 'In the C++ STL, what does s.pop() return?',
+    opts: ['The removed element', 'The new top element', 'void — nothing', 'A boolean indicating success'],
+    answer: 2,
+    why: 'std::stack::pop() returns void. You must call top() first to get the value.'
+  },
+  {
+    q: 'Which real-world feature is a stack the natural model for?',
+    opts: ['A printer queue', 'The Ctrl+Z undo history', 'A phone contact list', 'Sorting numbers'],
+    answer: 1,
+    why: 'Undo needs the most recent action reversed first — exactly LIFO behaviour.'
+  }
+];
+
+const quizBox = document.getElementById('quizContainer');
+let answeredCount = 0;
+let correctCount  = 0;
+
+QUIZ.forEach(function(item, qi){
+  const wrap = document.createElement('div');
+  wrap.className = 'quiz-item';
+
+  const qEl = document.createElement('div');
+  qEl.className = 'quiz-q';
+  qEl.textContent = (qi + 1) + '. ' + item.q;
+  wrap.appendChild(qEl);
+
+  const optsEl = document.createElement('div');
+  optsEl.className = 'quiz-opts';
+
+  const fb = document.createElement('div');
+  fb.className = 'quiz-feedback';
+
+  item.opts.forEach(function(optText, oi){
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.type = 'button';
+    b.textContent = String.fromCharCode(65 + oi) + ')  ' + optText;
+
+    b.addEventListener('click', function(){
+      if (wrap.dataset.answered === 'yes') return;   // only one attempt
+      wrap.dataset.answered = 'yes';
+
+      const isRight = (oi === item.answer);
+      b.classList.add(isRight ? 'chosen-right' : 'chosen-wrong');
+
+      if (!isRight){
+        // also reveal the correct one
+        const buttons = optsEl.querySelectorAll('.opt');
+        buttons[item.answer].classList.add('chosen-right');
+      }
+
+      wrap.classList.add(isRight ? 'correct' : 'wrong');
+
+      fb.textContent = (isRight ? '✅ Correct!  ' : '❌ Not quite.  ') + item.why;
+      fb.classList.add('show');
+
+      answeredCount++;
+      if (isRight) correctCount++;
+
+      if (answeredCount === QUIZ.length){
+        const box = document.getElementById('quizScoreBox');
+        const txt = document.getElementById('quizScoreText');
+        let remark = '';
+        if (correctCount === QUIZ.length)      remark = '🏆 Perfect score! You have mastered stacks.';
+        else if (correctCount >= QUIZ.length - 1) remark = '🌟 Excellent work — just one slip.';
+        else if (correctCount >= QUIZ.length / 2) remark = '👍 Good — review the sections you missed.';
+        else                                    remark = '📖 Re-read the manual, then try again.';
+        txt.textContent = 'You scored ' + correctCount + ' out of ' + QUIZ.length + '. ' + remark;
+        box.style.display = 'block';
+      }
+    });
+
+    optsEl.appendChild(b);
+  });
+
+  wrap.appendChild(optsEl);
+  wrap.appendChild(fb);
+  quizBox.appendChild(wrap);
+});
+</script>
+
+</body>
+</html>

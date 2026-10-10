@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#f2ede2" />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,650;6..72,750&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Lab Manual: Queues in C++</title>
+  <style>
+    :root{
+      --paper:#f2ede2; --surface:#fffdf8; --ink:#18252b; --muted:#58656a;
+      --line:#cec6b8; --accent:#d24b2f; --accent-2:#087b83; --accent-soft:#f7d9cc;
+      --code:#17262b; --code-ink:#eef4ef; --code-muted:#a5b8b8; --shadow:0 14px 38px rgba(54,43,29,.10);
+      --nav:#e8e1d4; --success:#237347; --warn:#9b5b00;
+    }
+    @media(prefers-color-scheme:dark){
+      :root{
+        --paper:#10181b; --surface:#172226; --ink:#edf2ea; --muted:#b2bfbe;
+        --line:#3a494c; --accent:#ff795d; --accent-2:#56c3c7; --accent-soft:#4a2924;
+        --code:#091013; --code-ink:#eef4ef; --code-muted:#9cb0b0; --shadow:0 16px 38px rgba(0,0,0,.24);
+        --nav:#131e21; --success:#72d79b; --warn:#f4ba5c;
+      }
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:24px}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:"Source Sans 3",sans-serif;font-size:17px;line-height:1.65}
+    a{color:inherit}.page{max-width:1280px;margin:auto;display:grid;grid-template-columns:240px minmax(0,1fr);gap:42px;padding:28px 34px 80px}
+    aside{position:sticky;top:20px;align-self:start;background:var(--nav);border:1px solid var(--line);padding:20px 17px 18px;max-height:calc(100vh - 40px);overflow:auto}
+    .nav-label{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin:0 0 9px}
+    nav a{display:block;text-decoration:none;padding:7px 8px;border-radius:5px;color:var(--muted);font-size:15px;line-height:1.25;margin:2px 0}
+    nav a:hover,nav a:focus{background:var(--surface);color:var(--ink);outline:none}
+    .progress-track{height:4px;background:var(--line);margin:17px 7px 9px;overflow:hidden;border-radius:9px}.progress-bar{width:0;height:100%;background:var(--accent)}
+    .progress-text{font:12px "IBM Plex Mono",monospace;color:var(--muted);margin:0 7px}
+    main{min-width:0}
+    .masthead{border-top:8px solid var(--ink);padding:38px 0 42px;border-bottom:1px solid var(--line)}
+    .meta{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--muted);font-size:14px;font-family:"IBM Plex Mono",monospace}
+    .meta strong{color:var(--ink)}
+    h1,h2,h3{font-family:"Newsreader",serif;line-height:1.03;margin:0;color:var(--ink)}
+    h1{font-size:clamp(48px,8vw,92px);max-width:850px;letter-spacing:-.045em;margin:22px 0 20px}
+    .lede{font-size:clamp(20px,2.4vw,27px);line-height:1.35;max-width:760px;margin:0;color:var(--muted)}
+    .hero-line{margin-top:32px;display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;color:var(--muted);font:13px "IBM Plex Mono",monospace}
+    .hero-line::before,.hero-line::after{content:"";height:1px;background:var(--line)}
+    section{padding:72px 0 0}.section-no{display:block;font:600 13px "IBM Plex Mono",monospace;color:var(--accent);margin-bottom:10px}.section-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,.6fr);gap:36px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:30px}
+    h2{font-size:clamp(36px,5vw,61px);letter-spacing:-.035em}.section-intro{margin:0;color:var(--muted);font-size:18px;line-height:1.48}.content-narrow{max-width:800px}h3{font-size:30px;letter-spacing:-.015em;margin:42px 0 14px}p{margin:0 0 18px}
+    .objectives{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .objective{background:var(--surface);padding:22px 24px}.objective b{font-family:"IBM Plex Mono",monospace;color:var(--accent);font-size:13px}.objective p{margin:7px 0 0;line-height:1.42}
+    .analogy{display:grid;grid-template-columns:.78fr 1.22fr;background:var(--ink);color:var(--paper);margin:34px 0;box-shadow:var(--shadow)}
+    .analogy-copy{padding:30px}.analogy h3{color:var(--paper);margin:0 0 12px}.analogy p{color:var(--paper);opacity:.85}.analogy-note{padding:30px;border-left:1px solid rgba(255,255,255,.25);display:flex;flex-direction:column;justify-content:center}
+    .rule{font:600 clamp(24px,3vw,38px)/1.18 "Newsreader",serif;margin:0}.rule em{color:#ff997f;font-style:normal}.caption{font:13px "IBM Plex Mono",monospace;color:var(--muted)}
+    .diagram{margin:26px 0;background:var(--surface);border:1px solid var(--line);padding:24px;box-shadow:var(--shadow)}
+    .diagram-title{display:flex;justify-content:space-between;gap:16px;align-items:baseline;margin-bottom:22px}.diagram-title h3{font-size:24px;margin:0}.queue-row{display:flex;align-items:stretch;gap:0;max-width:800px;margin:20px auto}.qcell{height:86px;min-width:88px;flex:1;border:2px solid var(--ink);border-right:0;display:flex;align-items:center;justify-content:center;font:600 20px "IBM Plex Mono",monospace;background:var(--paper)}.qcell:last-child{border-right:2px solid var(--ink)}.end-label{display:flex;justify-content:space-between;max-width:800px;margin:auto;font:600 12px "IBM Plex Mono",monospace;color:var(--accent)}
+    .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:center;margin:28px 0}.flow-card{background:var(--surface);border-top:4px solid var(--accent-2);padding:18px;border-bottom:1px solid var(--line);min-height:130px}.flow-card b{font:600 13px "IBM Plex Mono",monospace;color:var(--accent-2)}.flow-card p{margin:8px 0 0;line-height:1.35}.arrow{font:26px "IBM Plex Mono",monospace;color:var(--accent)}
+    .callout{border-left:5px solid var(--accent);padding:18px 22px;background:var(--accent-soft);margin:26px 0}.callout b{display:block;margin-bottom:4px}.callout p{margin:0}.humor{font-family:"Newsreader",serif;font-style:italic;font-size:21px}
+    .code-wrap{margin:24px 0 34px;background:var(--code);color:var(--code-ink);box-shadow:var(--shadow);overflow:hidden}.code-head{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid #385057;font:12px "IBM Plex Mono",monospace;color:var(--code-muted)}button{font:600 13px "Source Sans 3",sans-serif;cursor:pointer}.copy{background:transparent;color:var(--code-ink);border:1px solid #61757b;padding:5px 10px;border-radius:4px}.copy:hover{background:#253a40}.code-wrap pre{margin:0;padding:20px 22px;overflow:auto;font:14px/1.62 "IBM Plex Mono",monospace;tab-size:4}.kw{color:#ff9a7f}.type{color:#78d4d4}.str{color:#d8df8a}.cm{color:#8ca2a2}.num{color:#ffc670}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:22px}.mini-card{background:var(--surface);border:1px solid var(--line);padding:24px}.mini-card h3{margin:0 0 10px;font-size:25px}.mini-card p:last-child{margin-bottom:0}
+    .ops{width:100%;border-collapse:collapse;margin:24px 0}.ops th,.ops td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}.ops th{font:600 12px "IBM Plex Mono",monospace;text-transform:uppercase;color:var(--accent)}.ops td:first-child{font-family:"IBM Plex Mono",monospace;font-weight:600}
+    .sim{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);margin:30px 0;padding:28px}.sim-head{display:flex;justify-content:space-between;align-items:start;gap:20px}.sim-head h3{margin:0;font-size:30px}.sim-controls{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0}.sim input{width:150px;padding:10px 12px;background:var(--paper);color:var(--ink);border:1px solid var(--line);font:16px "IBM Plex Mono",monospace}.btn{border:0;padding:10px 16px;background:var(--ink);color:var(--paper);border-radius:4px}.btn.alt{background:var(--accent)}.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}.sim-stage{min-height:120px;border-block:1px solid var(--line);display:flex;align-items:center;padding:20px 0;overflow:hidden}.sim-queue{display:flex;align-items:center;gap:5px;min-width:0;flex-wrap:wrap}.sim-item{width:68px;height:62px;background:var(--accent-soft);border:2px solid var(--accent);display:grid;place-items:center;font:600 16px "IBM Plex Mono",monospace;animation:pop .25s ease}.sim-empty{color:var(--muted);font-style:italic}.status{min-height:26px;margin:14px 0 0;font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--accent-2)}@keyframes pop{from{transform:scale(.85);opacity:.2}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.sim-item{animation:none}}
+    .steps{counter-reset:step;display:grid;gap:14px;margin:26px 0}.step{counter-increment:step;display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:start;padding:18px 0;border-bottom:1px solid var(--line)}.step::before{content:counter(step,decimal-leading-zero);font:600 18px "IBM Plex Mono",monospace;color:var(--accent)}.step h3{font-size:24px;margin:0 0 5px}.step p{margin:0;color:var(--muted)}
+    .comparison{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0}.compare{padding:22px;background:var(--surface);border-top:5px solid var(--accent-2)}.compare h3{font-size:26px;margin:0 0 10px}.compare ul{padding-left:20px;margin-bottom:0}
+    .complexity{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:26px 0}.metric{background:var(--surface);padding:18px}.metric b{display:block;font:600 25px "IBM Plex Mono",monospace;color:var(--accent-2)}.metric span{font-size:14px;color:var(--muted)}
+    .mistakes{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.mistake{padding:20px;background:var(--surface);border:1px solid var(--line)}.mistake .bad{color:var(--accent);font:600 13px "IBM Plex Mono",monospace}.mistake h3{font-size:23px;margin:7px 0}.fix{color:var(--success);font-weight:600}
+    .applications{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.application{padding:24px;background:var(--surface);border-bottom:4px solid var(--accent)}.application h3{font-size:26px;margin:0 0 8px}.application code{font-family:"IBM Plex Mono",monospace;color:var(--accent-2)}
+    .challenge{display:grid;grid-template-columns:90px 1fr;gap:20px;padding:25px 0;border-top:1px solid var(--line)}.challenge:last-child{border-bottom:1px solid var(--line)}.points{font:600 13px "IBM Plex Mono",monospace;color:var(--accent);padding-top:5px}.challenge h3{font-size:27px;margin:0 0 8px}.challenge p{margin:0 0 8px}.requirements{display:flex;flex-wrap:wrap;gap:7px}.tag{font:12px "IBM Plex Mono",monospace;background:var(--nav);padding:4px 8px;border:1px solid var(--line)}
+    .week-plan{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:28px 0}.day{background:var(--surface);padding:18px}.day b{display:block;color:var(--accent);font-family:"IBM Plex Mono",monospace;font-size:13px;margin-bottom:7px}.day p{font-size:15px;line-height:1.4;margin:0}
+    .checklist{list-style:none;padding:0;margin:20px 0}.checklist li{padding:10px 0 10px 31px;border-bottom:1px solid var(--line);position:relative}.checklist li::before{content:"□";position:absolute;left:3px;color:var(--accent);font:21px "IBM Plex Mono",monospace}
+    .footer{margin-top:80px;padding:28px 0 0;border-top:7px solid var(--ink);display:flex;justify-content:space-between;gap:30px;color:var(--muted);font-size:14px}.footer strong{color:var(--ink)}
+    .mobile-nav{display:none}
+    @media(max-width:900px){.page{grid-template-columns:1fr;padding:0 22px 60px;gap:0}aside{display:none}.mobile-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;position:sticky;top:0;z-index:10;background:var(--line);border-bottom:1px solid var(--line);margin:0 -22px}.mobile-nav a{text-decoration:none;text-align:center;background:var(--nav);padding:10px 5px;font-size:12px;font-weight:600}.masthead{padding-top:45px}.section-head{grid-template-columns:1fr;gap:14px}.comparison{grid-template-columns:1fr}.week-plan{grid-template-columns:1fr 1fr}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg);text-align:center}.qcell{min-width:0;height:70px}.analogy{grid-template-columns:1fr}.analogy-note{border-left:0;border-top:1px solid rgba(255,255,255,.25)} }
+    @media(max-width:620px){body{font-size:16px}.page{padding-inline:16px}.mobile-nav{margin-inline:-16px}.meta{display:grid;gap:5px}.objectives,.split,.mistakes,.applications{grid-template-columns:1fr}.complexity{grid-template-columns:1fr 1fr}.week-plan{grid-template-columns:1fr}.queue-row{flex-wrap:wrap;gap:4px}.qcell,.qcell:last-child{flex:0 0 calc(33.333% - 4px);border:2px solid var(--ink);height:58px}.end-label{font-size:10px}.sim{padding:20px 16px}.sim-head{display:block}.challenge{grid-template-columns:1fr;gap:4px}.code-wrap{margin-inline:-16px}.code-wrap pre{font-size:12px;padding:17px 16px}.footer{display:block}h1{font-size:49px}}
+    @media print{.page{display:block;max-width:none;padding:0}aside,.mobile-nav,.sim-controls,.copy{display:none!important}section{break-inside:avoid}.code-wrap{box-shadow:none}.masthead{padding-top:10px}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <aside aria-label="Lab contents">
+      <p class="nav-label">Lab route</p>
+      <nav>
+        <a href="#outcomes">01 · Outcomes</a><a href="#idea">02 · Queue idea</a><a href="#operations">03 · Operations</a><a href="#array">04 · Array queue</a><a href="#circular">05 · Circular queue</a><a href="#linked">06 · Linked-list queue</a><a href="#stl">07 · STL queue</a><a href="#applications">08 · Applications</a><a href="#debug">09 · Debug clinic</a><a href="#tasks">10 · Weekly tasks</a>
+      </nav>
+      <div class="progress-track"><div class="progress-bar" id="progress"></div></div>
+      <p class="progress-text" id="progressText">0% explored</p>
+    </aside>
+
+    <main>
+      <div class="mobile-nav" aria-label="Quick navigation"><a href="#idea">Concept</a><a href="#array">Code</a><a href="#tasks">Tasks</a></div>
+      <header class="masthead">
+        <div class="meta"><span><strong>FAST NUCES</strong> · Peshawar Campus</span><span>Data Structures</span><span>Instructor: <strong>Hamza Raziq Khan</strong></span></div>
+        <h1>Queues in C++</h1>
+        <p class="lede">A hands-on lab about fair lines, moving pointers, circular thinking—and why cutting in line is both rude and an algorithmic violation.</p>
+        <div class="hero-line"><span>Undergraduate CS · Guided lab</span></div>
+      </header>
+
+      <section id="outcomes">
+        <div class="section-head"><div><span class="section-no">01 / BEFORE WE BEGIN</span><h2>Lab outcomes</h2></div><p class="section-intro">You already know arrays, pointers, linked lists, and stacks. Today we turn that knowledge sideways and make a line.</p></div>
+        <div class="objectives">
+          <div class="objective"><b>EXPLAIN</b><p>Describe FIFO and identify the front and rear of a queue.</p></div>
+          <div class="objective"><b>TRACE</b><p>Follow enqueue and dequeue operations without losing an index—or your patience.</p></div>
+          <div class="objective"><b>IMPLEMENT</b><p>Build queues with a fixed array, circular array, and linked list.</p></div>
+          <div class="objective"><b>USE</b><p>Apply <code>std::queue</code> and choose a suitable queue design for a problem.</p></div>
+        </div>
+        <div class="callout"><b>Prerequisite checkpoint</b><p>Comfortable with variables, functions, basic C++, arrays, introductory pointers/references, linked lists, and stacks? Excellent. If a pointer still looks like an arrow with commitment issues, review linked-list insertion first.</p></div>
+      </section>
+
+      <section id="idea">
+        <div class="section-head"><div><span class="section-no">02 / THE CORE IDEA</span><h2>First in, first out</h2></div><p class="section-intro">A queue serves items in arrival order. The earliest arrival leaves first: <strong>FIFO</strong>.</p></div>
+        <div class="analogy">
+          <div class="analogy-copy"><h3>The cafeteria line</h3><p>Students join at the rear. Lunch is served at the front. A new arrival does not teleport to the counter—unless they want a lecture on both manners and asymptotic behavior.</p></div>
+          <div class="analogy-note"><p class="rule"><em>Enqueue</em> at the rear.<br><em>Dequeue</em> from the front.</p></div>
+        </div>
+        <div class="diagram" role="img" aria-label="A queue with Ali at the front, then Sara, Noor, and Zain at the rear">
+          <div class="diagram-title"><h3>Anatomy of a queue</h3><span class="caption">next to leave →</span></div>
+          <div class="end-label"><span>FRONT · removal happens here</span><span>REAR · insertion happens here</span></div>
+          <div class="queue-row"><div class="qcell">Ali</div><div class="qcell">Sara</div><div class="qcell">Noor</div><div class="qcell">Zain</div></div>
+          <p class="caption">Ali arrived first, so Ali leaves first. Zain joined last and waits at the rear.</p>
+        </div>
+        <h3>Queue vocabulary</h3>
+        <table class="ops">
+          <thead><tr><th>Operation</th><th>Meaning</th><th>Everyday translation</th></tr></thead>
+          <tbody><tr><td>enqueue(x)</td><td>Add <code>x</code> at the rear.</td><td>Join the end of the line.</td></tr><tr><td>dequeue()</td><td>Remove the front item.</td><td>Serve the next person.</td></tr><tr><td>front()</td><td>Read the front item without removing it.</td><td>Ask, “Who is next?”</td></tr><tr><td>isEmpty()</td><td>Check whether no items remain.</td><td>Did everyone get lunch?</td></tr><tr><td>isFull()</td><td>For bounded queues, check capacity.</td><td>Is the waiting room packed?</td></tr></tbody>
+        </table>
+        <div class="split">
+          <div class="mini-card"><h3>Queue vs. stack</h3><p><strong>Queue:</strong> FIFO—oldest item leaves first.</p><p><strong>Stack:</strong> LIFO—newest item leaves first.</p></div>
+          <div class="mini-card"><h3>Two important errors</h3><p><strong>Underflow:</strong> dequeue from empty.</p><p><strong>Overflow:</strong> enqueue into a full fixed-capacity queue.</p></div>
+        </div>
+      </section>
+
+      <section id="operations">
+        <div class="section-head"><div><span class="section-no">03 / TRACE IT</span><h2>Watch FIFO happen</h2></div><p class="section-intro">Run the queue yourself. This simulator keeps state only while this page is open; refresh to start over.</p></div>
+        <div class="sim">
+          <div class="sim-head"><div><h3>Queue playground</h3><p class="caption">Capacity: 6 items</p></div><p class="caption" id="counter">0 / 6 used</p></div>
+          <div class="sim-controls"><label><span class="caption">VALUE</span><br><input id="queueInput" maxlength="10" value="42" aria-label="Value to enqueue"></label><button class="btn alt" id="enqueueBtn">Enqueue</button><button class="btn" id="dequeueBtn">Dequeue</button><button class="btn ghost" id="peekBtn">Peek</button><button class="btn ghost" id="resetBtn">Reset</button></div>
+          <div class="end-label"><span>FRONT</span><span>REAR</span></div>
+          <div class="sim-stage"><div class="sim-queue" id="simQueue"><span class="sim-empty">The queue is empty. Even the bugs have gone home.</span></div></div>
+          <p class="status" id="simStatus" aria-live="polite">Ready for the first enqueue.</p>
+        </div>
+        <div class="flow">
+          <div class="flow-card"><b>STATE 1</b><p><code>enqueue(10)</code><br>Queue: [10]</p></div><div class="arrow">→</div>
+          <div class="flow-card"><b>STATE 2</b><p><code>enqueue(20)</code><br>Queue: [10, 20]</p></div><div class="arrow">→</div>
+          <div class="flow-card"><b>STATE 3</b><p><code>dequeue()</code><br>Returns 10; queue: [20]</p></div>
+        </div>
+        <div class="complexity"><div class="metric"><b>O(1)</b><span>enqueue</span></div><div class="metric"><b>O(1)</b><span>dequeue</span></div><div class="metric"><b>O(1)</b><span>front / peek</span></div><div class="metric"><b>O(n)</b><span>search (if needed)</span></div></div>
+      </section>
+
+      <section id="array">
+        <div class="section-head"><div><span class="section-no">04 / IMPLEMENTATION A</span><h2>Linear array queue</h2></div><p class="section-intro">Two indices do the bookkeeping: <code>frontIndex</code> points to the next item to remove; <code>rearIndex</code> points to the last inserted item.</p></div>
+        <div class="steps">
+          <div class="step"><div><h3>Start empty</h3><p>Set both indices to −1. This sentinel means “no valid position yet.”</p></div></div>
+          <div class="step"><div><h3>First enqueue</h3><p>Move both indices to 0, then store the first value.</p></div></div>
+          <div class="step"><div><h3>Later enqueues</h3><p>Increment <code>rearIndex</code>, then place the value there.</p></div></div>
+          <div class="step"><div><h3>Dequeue</h3><p>Read the front value, then increment <code>frontIndex</code>. If it passed the rear, reset both indices.</p></div></div>
+        </div>
+        <div class="code-wrap"><div class="code-head"><span>linear_queue.cpp · complete program</span><button class="copy" data-copy="linearCode">Copy code</button></div><pre id="linearCode"><code><span class="kw">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="type">ArrayQueue</span> {
+<span class="kw">private</span>:
+    <span class="kw">static const int</span> CAPACITY = <span class="num">5</span>;
+    <span class="kw">int</span> data[CAPACITY];
+    <span class="kw">int</span> frontIndex;
+    <span class="kw">int</span> rearIndex;
+
+<span class="kw">public</span>:
+    <span class="cm">// A new queue contains no valid indices.</span>
+    ArrayQueue() : frontIndex(-<span class="num">1</span>), rearIndex(-<span class="num">1</span>) {}
+
+    <span class="kw">bool</span> isEmpty() <span class="kw">const</span> {
+        <span class="kw">return</span> frontIndex == -<span class="num">1</span>;
+    }
+
+    <span class="kw">bool</span> isFull() <span class="kw">const</span> {
+        <span class="kw">return</span> rearIndex == CAPACITY - <span class="num">1</span>;
+    }
+
+    <span class="kw">void</span> enqueue(<span class="kw">int</span> value) {
+        <span class="kw">if</span> (isFull()) {
+            cout &lt;&lt; <span class="str">"Queue overflow: no space left.\n"</span>;
+            <span class="kw">return</span>;
+        }
+        <span class="kw">if</span> (isEmpty()) frontIndex = <span class="num">0</span>;
+        data[++rearIndex] = value;
+    }
+
+    <span class="kw">bool</span> dequeue(<span class="kw">int</span>&amp; removedValue) {
+        <span class="kw">if</span> (isEmpty()) {
+            cout &lt;&lt; <span class="str">"Queue underflow: nothing to remove.\n"</span>;
+            <span class="kw">return false</span>;
+        }
+        removedValue = data[frontIndex++];
+
+        <span class="cm">// The final element was removed: restore empty state.</span>
+        <span class="kw">if</span> (frontIndex &gt; rearIndex) {
+            frontIndex = rearIndex = -<span class="num">1</span>;
+        }
+        <span class="kw">return true</span>;
+    }
+
+    <span class="kw">bool</span> front(<span class="kw">int</span>&amp; value) <span class="kw">const</span> {
+        <span class="kw">if</span> (isEmpty()) <span class="kw">return false</span>;
+        value = data[frontIndex];
+        <span class="kw">return true</span>;
+    }
+
+    <span class="kw">void</span> display() <span class="kw">const</span> {
+        <span class="kw">if</span> (isEmpty()) {
+            cout &lt;&lt; <span class="str">"[empty]\n"</span>;
+            <span class="kw">return</span>;
+        }
+        cout &lt;&lt; <span class="str">"Front -&gt; "</span>;
+        <span class="kw">for</span> (<span class="kw">int</span> i = frontIndex; i &lt;= rearIndex; ++i)
+            cout &lt;&lt; data[i] &lt;&lt; <span class="str">' '</span>;
+        cout &lt;&lt; <span class="str">"&lt;- Rear\n"</span>;
+    }
+};
+
+<span class="kw">int</span> main() {
+    ArrayQueue q;
+    q.enqueue(<span class="num">10</span>);
+    q.enqueue(<span class="num">20</span>);
+    q.enqueue(<span class="num">30</span>);
+    q.display();
+
+    <span class="kw">int</span> removed;
+    <span class="kw">if</span> (q.dequeue(removed))
+        cout &lt;&lt; <span class="str">"Removed: "</span> &lt;&lt; removed &lt;&lt; <span class="str">'\n'</span>;
+
+    q.display();
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre></div>
+        <div class="callout"><b>The linear-array limitation</b><p>After dequeues, unused cells may exist before <code>frontIndex</code>, but <code>rearIndex</code> cannot move past the final array cell. The queue may report “full” while space sits unused at the beginning. We can shift every item—slow—or make the indices wrap around—smart.</p></div>
+      </section>
+
+      <section id="circular">
+        <div class="section-head"><div><span class="section-no">05 / IMPLEMENTATION B</span><h2>Circular queue</h2></div><p class="section-intro">A circular queue treats the last array position as adjacent to the first. Modular arithmetic makes the wrap-around precise.</p></div>
+        <div class="diagram">
+          <div class="diagram-title"><h3>Wrap-around formula</h3><span class="caption">for capacity = N</span></div>
+          <p class="rule"><code>next = (current + 1) % N</code></p>
+          <p>If <code>current = 4</code> and <code>N = 5</code>, then <code>(4 + 1) % 5 = 0</code>. The index returns to the beginning—no teleportation, just remainder arithmetic.</p>
+        </div>
+        <div class="steps">
+          <div class="step"><div><h3>Track the count</h3><p><code>count == 0</code> means empty; <code>count == CAPACITY</code> means full. No ambiguous index gymnastics.</p></div></div>
+          <div class="step"><div><h3>Insert, then wrap</h3><p>Store at <code>rearIndex</code>, then set <code>rearIndex = (rearIndex + 1) % CAPACITY</code>.</p></div></div>
+          <div class="step"><div><h3>Remove, then wrap</h3><p>Read at <code>frontIndex</code>, then advance it with the same formula.</p></div></div>
+        </div>
+        <div class="code-wrap"><div class="code-head"><span>circular_queue.cpp · reusable template</span><button class="copy" data-copy="circularCode">Copy code</button></div><pre id="circularCode"><code><span class="kw">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">template</span> &lt;<span class="kw">typename</span> T, <span class="kw">int</span> CAPACITY&gt;
+<span class="kw">class</span> <span class="type">CircularQueue</span> {
+<span class="kw">private</span>:
+    T data[CAPACITY];
+    <span class="kw">int</span> frontIndex = <span class="num">0</span>; <span class="cm">// Next item to remove</span>
+    <span class="kw">int</span> rearIndex = <span class="num">0</span>;  <span class="cm">// Next free slot</span>
+    <span class="kw">int</span> count = <span class="num">0</span>;
+
+<span class="kw">public</span>:
+    <span class="kw">bool</span> isEmpty() <span class="kw">const</span> { <span class="kw">return</span> count == <span class="num">0</span>; }
+    <span class="kw">bool</span> isFull() <span class="kw">const</span> { <span class="kw">return</span> count == CAPACITY; }
+    <span class="kw">int</span> size() <span class="kw">const</span> { <span class="kw">return</span> count; }
+
+    <span class="kw">bool</span> enqueue(<span class="kw">const</span> T&amp; value) {
+        <span class="kw">if</span> (isFull()) <span class="kw">return false</span>;
+
+        data[rearIndex] = value;
+        rearIndex = (rearIndex + <span class="num">1</span>) % CAPACITY;
+        ++count;
+        <span class="kw">return true</span>;
+    }
+
+    <span class="kw">bool</span> dequeue(T&amp; removedValue) {
+        <span class="kw">if</span> (isEmpty()) <span class="kw">return false</span>;
+
+        removedValue = data[frontIndex];
+        frontIndex = (frontIndex + <span class="num">1</span>) % CAPACITY;
+        --count;
+        <span class="kw">return true</span>;
+    }
+
+    <span class="kw">bool</span> front(T&amp; value) <span class="kw">const</span> {
+        <span class="kw">if</span> (isEmpty()) <span class="kw">return false</span>;
+        value = data[frontIndex];
+        <span class="kw">return true</span>;
+    }
+
+    <span class="kw">void</span> display() <span class="kw">const</span> {
+        cout &lt;&lt; <span class="str">"Front -&gt; "</span>;
+        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; count; ++i) {
+            <span class="kw">int</span> index = (frontIndex + i) % CAPACITY;
+            cout &lt;&lt; data[index] &lt;&lt; <span class="str">' '</span>;
+        }
+        cout &lt;&lt; <span class="str">"&lt;- Rear\n"</span>;
+    }
+};
+
+<span class="kw">int</span> main() {
+    CircularQueue&lt;<span class="kw">int</span>, <span class="num">5</span>&gt; q;
+    q.enqueue(<span class="num">10</span>); q.enqueue(<span class="num">20</span>); q.enqueue(<span class="num">30</span>);
+
+    <span class="kw">int</span> removed;
+    q.dequeue(removed); <span class="cm">// Removes 10</span>
+    q.enqueue(<span class="num">40</span>); q.enqueue(<span class="num">50</span>); q.enqueue(<span class="num">60</span>);
+    q.display();       <span class="cm">// 20 30 40 50 60</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre></div>
+      </section>
+
+      <section id="linked">
+        <div class="section-head"><div><span class="section-no">06 / IMPLEMENTATION C</span><h2>Linked-list queue</h2></div><p class="section-intro">A linked queue grows one node at a time. The front pointer removes; the rear pointer inserts. Both operations stay O(1).</p></div>
+        <div class="diagram" role="img" aria-label="Linked queue nodes 10, 20, and 30 connected from front to rear">
+          <div class="diagram-title"><h3>Two pointers, two jobs</h3><span class="caption">nullptr ends the chain</span></div>
+          <div class="flow"><div class="flow-card"><b>FRONT</b><p>Node 10<br><code>next →</code></p></div><div class="arrow">→</div><div class="flow-card"><b>MIDDLE</b><p>Node 20<br><code>next →</code></p></div><div class="arrow">→</div><div class="flow-card"><b>REAR</b><p>Node 30<br><code>next = nullptr</code></p></div></div>
+        </div>
+        <div class="code-wrap"><div class="code-head"><span>linked_queue.cpp · complete program</span><button class="copy" data-copy="linkedCode">Copy code</button></div><pre id="linkedCode"><code><span class="kw">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">class</span> <span class="type">LinkedQueue</span> {
+<span class="kw">private</span>:
+    <span class="kw">struct</span> <span class="type">Node</span> {
+        <span class="kw">int</span> value;
+        Node* next;
+        Node(<span class="kw">int</span> v) : value(v), next(<span class="kw">nullptr</span>) {}
+    };
+
+    Node* frontPtr = <span class="kw">nullptr</span>;
+    Node* rearPtr = <span class="kw">nullptr</span>;
+
+<span class="kw">public</span>:
+    <span class="cm">// Destructor prevents memory leaks.</span>
+    ~LinkedQueue() {
+        <span class="kw">int</span> ignored;
+        <span class="kw">while</span> (dequeue(ignored)) { }
+    }
+
+    <span class="kw">bool</span> isEmpty() <span class="kw">const</span> {
+        <span class="kw">return</span> frontPtr == <span class="kw">nullptr</span>;
+    }
+
+    <span class="kw">void</span> enqueue(<span class="kw">int</span> value) {
+        Node* newNode = <span class="kw">new</span> Node(value);
+
+        <span class="kw">if</span> (isEmpty()) {
+            frontPtr = rearPtr = newNode;
+        } <span class="kw">else</span> {
+            rearPtr-&gt;next = newNode;
+            rearPtr = newNode;
+        }
+    }
+
+    <span class="kw">bool</span> dequeue(<span class="kw">int</span>&amp; removedValue) {
+        <span class="kw">if</span> (isEmpty()) <span class="kw">return false</span>;
+
+        Node* oldFront = frontPtr;
+        removedValue = oldFront-&gt;value;
+        frontPtr = frontPtr-&gt;next;
+        <span class="kw">delete</span> oldFront;
+
+        <span class="cm">// If the queue became empty, rear must also be null.</span>
+        <span class="kw">if</span> (frontPtr == <span class="kw">nullptr</span>) rearPtr = <span class="kw">nullptr</span>;
+        <span class="kw">return true</span>;
+    }
+
+    <span class="kw">bool</span> front(<span class="kw">int</span>&amp; value) <span class="kw">const</span> {
+        <span class="kw">if</span> (isEmpty()) <span class="kw">return false</span>;
+        value = frontPtr-&gt;value;
+        <span class="kw">return true</span>;
+    }
+};
+
+<span class="kw">int</span> main() {
+    LinkedQueue q;
+    q.enqueue(<span class="num">7</span>); q.enqueue(<span class="num">14</span>); q.enqueue(<span class="num">21</span>);
+
+    <span class="kw">int</span> value;
+    <span class="kw">while</span> (q.dequeue(value))
+        cout &lt;&lt; <span class="str">"Serving: "</span> &lt;&lt; value &lt;&lt; <span class="str">'\n'</span>;
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre></div>
+        <div class="comparison">
+          <div class="compare"><h3>Linear array</h3><ul><li>Simple and cache-friendly</li><li>Fixed size</li><li>Can waste freed front cells</li></ul></div>
+          <div class="compare"><h3>Circular array</h3><ul><li>Reuses every slot</li><li>Fixed maximum size</li><li>Excellent for buffers</li></ul></div>
+          <div class="compare"><h3>Linked list</h3><ul><li>Grows dynamically</li><li>Extra pointer per node</li><li>Allocation can fail</li></ul></div>
+        </div>
+      </section>
+
+      <section id="stl">
+        <div class="section-head"><div><span class="section-no">07 / THE STANDARD LIBRARY</span><h2>Use std::queue</h2></div><p class="section-intro">When the task is to solve a problem—not reimplement the structure—use the tested adapter in <code>&lt;queue&gt;</code>.</p></div>
+        <div class="code-wrap"><div class="code-head"><span>stl_queue.cpp · complete program</span><button class="copy" data-copy="stlCode">Copy code</button></div><pre id="stlCode"><code><span class="kw">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;queue&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;string&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">int</span> main() {
+    queue&lt;string&gt; helpDesk;
+
+    helpDesk.push(<span class="str">"Ticket A: Wi-Fi issue"</span>);  <span class="cm">// enqueue</span>
+    helpDesk.push(<span class="str">"Ticket B: Login issue"</span>);
+    helpDesk.push(<span class="str">"Ticket C: Printer issue"</span>);
+
+    cout &lt;&lt; <span class="str">"Waiting: "</span> &lt;&lt; helpDesk.size() &lt;&lt; <span class="str">'\n'</span>;
+
+    <span class="kw">while</span> (!helpDesk.empty()) {
+        cout &lt;&lt; <span class="str">"Handling: "</span> &lt;&lt; helpDesk.front() &lt;&lt; <span class="str">'\n'</span>;
+        helpDesk.pop(); <span class="cm">// dequeue; pop() returns no value</span>
+    }
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre></div>
+        <table class="ops"><thead><tr><th>Our name</th><th>std::queue</th><th>Note</th></tr></thead><tbody><tr><td>enqueue(x)</td><td><code>q.push(x)</code></td><td>Adds to the back.</td></tr><tr><td>dequeue()</td><td><code>q.pop()</code></td><td>Removes but does not return a value.</td></tr><tr><td>front()</td><td><code>q.front()</code></td><td>Read before calling <code>pop()</code>.</td></tr><tr><td>rear()</td><td><code>q.back()</code></td><td>Reads the newest item.</td></tr><tr><td>isEmpty()</td><td><code>q.empty()</code></td><td>Always check before front/pop.</td></tr></tbody></table>
+        <div class="callout"><b>Safety habit</b><p><code>front()</code>, <code>back()</code>, and <code>pop()</code> require a non-empty queue. Check <code>empty()</code> first. C++ trusts you; sometimes with the confidence of a friend who definitely did not read the assignment.</p></div>
+      </section>
+
+      <section id="applications">
+        <div class="section-head"><div><span class="section-no">08 / WHY QUEUES MATTER</span><h2>Queues in the wild</h2></div><p class="section-intro">Queues appear wherever order, fairness, or delayed processing matters.</p></div>
+        <div class="applications">
+          <div class="application"><h3>Printer spooler</h3><p>Print jobs wait in arrival order. Add with <code>push()</code>; process the oldest with <code>front()</code> and <code>pop()</code>.</p></div>
+          <div class="application"><h3>Breadth-first search</h3><p>BFS visits all neighbors before moving deeper. The queue stores vertices discovered but not yet explored.</p></div>
+          <div class="application"><h3>Customer support</h3><p>Tickets enter at the rear and agents handle the front ticket. Priority queues adapt the rule for emergencies.</p></div>
+          <div class="application"><h3>Network buffers</h3><p>Packets wait while a device processes earlier arrivals. Circular queues are especially useful for bounded buffers.</p></div>
+        </div>
+        <h3>BFS example: shortest hops in an unweighted graph</h3>
+        <div class="code-wrap"><div class="code-head"><span>bfs.cpp · queue in an algorithm</span><button class="copy" data-copy="bfsCode">Copy code</button></div><pre id="bfsCode"><code><span class="kw">#include</span> <span class="str">&lt;iostream&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;queue&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;vector&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">void</span> bfs(<span class="kw">const</span> vector&lt;vector&lt;<span class="kw">int</span>&gt;&gt;&amp; graph, <span class="kw">int</span> start) {
+    vector&lt;<span class="kw">bool</span>&gt; visited(graph.size(), <span class="kw">false</span>);
+    queue&lt;<span class="kw">int</span>&gt; pending;
+
+    visited[start] = <span class="kw">true</span>;
+    pending.push(start);
+
+    <span class="kw">while</span> (!pending.empty()) {
+        <span class="kw">int</span> current = pending.front();
+        pending.pop();
+        cout &lt;&lt; current &lt;&lt; <span class="str">' '</span>;
+
+        <span class="kw">for</span> (<span class="kw">int</span> neighbor : graph[current]) {
+            <span class="kw">if</span> (!visited[neighbor]) {
+                visited[neighbor] = <span class="kw">true</span>; <span class="cm">// Mark before enqueue.</span>
+                pending.push(neighbor);
+            }
+        }
+    }
+}
+
+<span class="kw">int</span> main() {
+    vector&lt;vector&lt;<span class="kw">int</span>&gt;&gt; graph = {
+        {<span class="num">1</span>, <span class="num">2</span>}, {<span class="num">0</span>, <span class="num">3</span>}, {<span class="num">0</span>, <span class="num">4</span>}, {<span class="num">1</span>}, {<span class="num">2</span>}
+    };
+    bfs(graph, <span class="num">0</span>); <span class="cm">// Output: 0 1 2 3 4</span>
+}</code></pre></div>
+      </section>
+
+      <section id="debug">
+        <div class="section-head"><div><span class="section-no">09 / DEBUG CLINIC</span><h2>Classic queue bugs</h2></div><p class="section-intro">Most queue bugs are boundary bugs wearing a tiny fake mustache. Catch them with invariants and edge cases.</p></div>
+        <div class="mistakes">
+          <div class="mistake"><span class="bad">BUG 01</span><h3>Removing before checking</h3><p>Accessing <code>front()</code> on an empty queue is invalid.</p><p class="fix">Fix: test isEmpty()/empty() first.</p></div>
+          <div class="mistake"><span class="bad">BUG 02</span><h3>Rear not reset</h3><p>After deleting the final linked node, <code>rearPtr</code> still points to freed memory.</p><p class="fix">Fix: set rearPtr = nullptr.</p></div>
+          <div class="mistake"><span class="bad">BUG 03</span><h3>Wrong full condition</h3><p>Index equality in a circular queue can mean empty or full.</p><p class="fix">Fix: track count, or deliberately reserve one slot.</p></div>
+          <div class="mistake"><span class="bad">BUG 04</span><h3>Memory leak</h3><p>A linked queue removes nodes but never calls <code>delete</code>.</p><p class="fix">Fix: save old front, advance, delete old front.</p></div>
+        </div>
+        <h3>Minimum edge-case test set</h3>
+        <ul class="checklist"><li>Dequeue from an empty queue.</li><li>Enqueue exactly one item, then dequeue it.</li><li>Fill a bounded queue to capacity, then try one extra enqueue.</li><li>Wrap a circular queue past the final index.</li><li>Alternate enqueue and dequeue several times.</li><li>Destroy a non-empty linked queue; run with AddressSanitizer if available.</li></ul>
+      </section>
+
+      <section id="tasks">
+        <div class="challenge"><div class="points">TASK 01 · 20%</div><div><h3>Queue trace detective</h3><p>Trace this sequence on paper: enqueue 12, 7, 25; dequeue twice; enqueue 9, 30; dequeue once. Show the queue after every operation and label front/rear.</p><div class="requirements"><span class="tag">hand trace</span><span class="tag">7 states</span><span class="tag">FIFO explanation</span></div></div></div>
+        <div class="challenge"><div class="points">TASK 02 · 30%</div><div><h3>Circular queue, from scratch</h3><p>Implement a menu-driven circular queue of strings with capacity 8. Include enqueue, dequeue, front, size, display, overflow, and underflow. Do not use <code>std::queue</code>.</p><div class="requirements"><span class="tag">complete code</span><span class="tag">comments</span><span class="tag">5 edge tests</span></div></div></div>
+        <div class="challenge"><div class="points">TASK 03 · 30%</div><div><h3>Campus help-desk simulator</h3><p>Use <code>std::queue</code> to model student requests. Each request has an ID, student name, and issue. Allow adding requests, serving the next request, viewing the next request, and listing the current waiting count.</p><div class="requirements"><span class="tag">struct Request</span><span class="tag">menu loop</span><span class="tag">safe empty checks</span></div></div></div>
+        <div class="challenge"><div class="points">TASK 04 · 20%</div><div><h3>Reflection + complexity</h3><p>In 250–350 words, compare circular-array and linked-list queues. Discuss memory, capacity, cache behavior, allocation cost, and a scenario where each is the better choice.</p><div class="requirements"><span class="tag">original explanation</span><span class="tag">Big-O table</span><span class="tag">2 concrete scenarios</span></div></div></div>
+
+        <h3>Submission checklist</h3>
+        <ul class="checklist"><li>Every program compiles without errors or warnings.</li><li>Names describe their purpose; comments explain decisions, not obvious syntax.</li><li>Overflow and underflow are handled gracefully.</li><li>Sample runs include normal and edge-case behavior.</li><li>No mystery files named <code>final_final_really_final.cpp</code>.</li></ul>
+        <div class="analogy"><div class="analogy-copy"><h3>Final checkpoint</h3><p>If you can explain why dequeue happens at the front, implement circular wrap-around, and safely update both linked-list pointers, the queue has officially moved from “line at the café” to “tool in your algorithm kit.”</p></div><div class="analogy-note"><p class="rule">Arrive at the <em>rear</em>.<br>Leave from the <em>front</em>.<br>Check boundaries <em>always</em>.</p></div></div>
+      </section>
+
+      <footer class="footer"><p><strong>FAST NUCES Peshawar Campus</strong><br>Data Structures · Queue Lab Manual</p><p>Instructor: <strong>Hamza Raziq Khan</strong><br>Built for undergraduate CS students</p></footer>
+    </main>
+  </div>
+  <script>
+    (function(){
+      var values = [], limit = 6;
+      var input = document.getElementById('queueInput');
+      var queue = document.getElementById('simQueue');
+      var status = document.getElementById('simStatus');
+      var counter = document.getElementById('counter');
+      function render(){
+        queue.innerHTML = '';
+        if(!values.length){
+          var empty = document.createElement('span'); empty.className='sim-empty';
+          empty.textContent='The queue is empty. Even the bugs have gone home.'; queue.appendChild(empty);
+        } else {
+          values.forEach(function(value){ var item=document.createElement('span'); item.className='sim-item'; item.textContent=value; queue.appendChild(item); });
+        }
+        counter.textContent = values.length + ' / ' + limit + ' used';
+      }
+      document.getElementById('enqueueBtn').addEventListener('click', function(){
+        var value=input.value.trim();
+        if(!value){status.textContent='Enter a value before enqueueing.'; input.focus(); return;}
+        if(values.length===limit){status.textContent='Overflow: capacity 6 is already full.'; return;}
+        values.push(value); status.textContent='Enqueued "'+value+'" at the rear.'; input.select(); render();
+      });
+      document.getElementById('dequeueBtn').addEventListener('click', function(){
+        if(!values.length){status.textContent='Underflow: there is nothing to dequeue.'; return;}
+        var removed=values.shift(); status.textContent='Dequeued "'+removed+'" from the front.'; render();
+      });
+      document.getElementById('peekBtn').addEventListener('click', function(){
+        status.textContent=values.length ? 'Front value: "'+values[0]+'" (not removed).' : 'Peek failed: the queue is empty.';
+      });
+      document.getElementById('resetBtn').addEventListener('click', function(){values=[];status.textContent='Queue reset. Back to a beautifully empty state.';render();});
+      input.addEventListener('keydown', function(e){if(e.key==='Enter') document.getElementById('enqueueBtn').click();});
+      document.querySelectorAll('.copy').forEach(function(btn){btn.addEventListener('click',function(){
+        var text=document.getElementById(btn.getAttribute('data-copy')).innerText;
+        navigator.clipboard.writeText(text).then(function(){var old=btn.textContent;btn.textContent='Copied';setTimeout(function(){btn.textContent=old;},1400);});
+      });});
+      function updateProgress(){
+        var doc=document.documentElement, total=doc.scrollHeight-doc.clientHeight;
+        var pct=total>0?Math.round((doc.scrollTop/total)*100):100;
+        document.getElementById('progress').style.width=pct+'%'; document.getElementById('progressText').textContent=pct+'% explored';
+      }
+      document.addEventListener('scroll',updateProgress,{passive:true}); updateProgress(); render();
+    })();
+  </script>
+</body>
+</html>
