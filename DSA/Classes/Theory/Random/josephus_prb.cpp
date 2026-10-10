@@ -50,5 +50,5 @@ int josephus(int n, int k){
 
 int main(){
 
-    cout<<josephus(7,3);
+    cout<<josephus(10,3);
 }
